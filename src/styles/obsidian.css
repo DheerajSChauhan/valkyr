@@ -1,0 +1,217 @@
+/* ========================================================
+   Valkyr — Design System & Glassmorphism Tokens
+   Theme: Cinematic Dark Graphite & Electric Lime Accent
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Palette Tokens */
+  --bg-main: #101112;
+  --bg-secondary: #151718;
+  --surface-card: #1C1F20;
+  --surface-elevated: #242827;
+  --primary-accent: #C7FF3D; /* Electric Lime */
+  --primary-accent-glow: rgba(199, 255, 61, 0.22);
+  --primary-text: #F5F5F2;
+  --secondary-text: #929895;
+  --border-subtle: rgba(255, 255, 255, 0.10);
+  --border-active: rgba(199, 255, 61, 0.50);
+  
+  --recovery-accent: #65D9C0;
+  --achievement-accent: #FF9A58;
+  --error-accent: #EF4444;
+
+  /* Glassmorphism Specs */
+  --glass-surface: rgba(28, 31, 32, 0.65);
+  --glass-elevated: rgba(36, 40, 39, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-border-bright: rgba(255, 255, 255, 0.20);
+  --glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background-color: var(--bg-main);
+  color: var(--primary-text);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient Radial Glows Behind Featured Elements */
+.obsidian-ambient-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient-lime-orb {
+  position: absolute;
+  top: 15%;
+  right: -10%;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(199, 255, 61, 0.10) 0%, rgba(101, 217, 192, 0.05) 45%, transparent 70%);
+  filter: blur(80px);
+  border-radius: 50%;
+}
+
+.ambient-graphite-orb {
+  position: absolute;
+  top: 50%;
+  left: -15%;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(36, 40, 39, 0.8) 0%, rgba(21, 23, 24, 0.4) 50%, transparent 75%);
+  filter: blur(90px);
+  border-radius: 50%;
+}
+
+/* Glassmorphism Panels */
+.obsidian-glass {
+  background: var(--glass-surface);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-specular), 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+.obsidian-glass-elevated {
+  background: var(--glass-elevated);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--glass-border-bright);
+  box-shadow: var(--glass-specular), 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+}
+
+/* Featured Hero Workout Card */
+.featured-hero-glass {
+  position: relative;
+  background: linear-gradient(145deg, rgba(36, 40, 39, 0.82) 0%, rgba(21, 23, 24, 0.90) 100%);
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), 0 24px 50px -12px rgba(0, 0, 0, 0.75);
+  border-radius: 24px;
+}
+
+.featured-hero-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(199, 255, 61, 0.16) 0%, transparent 70%);
+  filter: blur(36px);
+  pointer-events: none;
+}
+
+/* Floating Bottom Navigation Island */
+.obsidian-bottom-nav {
+  background: rgba(21, 23, 24, 0.85);
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), 0 20px 50px rgba(0, 0, 0, 0.8);
+  border-radius: 9999px;
+}
+
+/* Floating Rest Timer Capsule */
+.obsidian-timer-dock {
+  background: rgba(16, 17, 18, 0.90);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(199, 255, 61, 0.35);
+  box-shadow: 0 0 24px rgba(199, 255, 61, 0.18), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+}
+
+/* Buttons */
+.btn-electric-lime {
+  background: var(--primary-accent);
+  color: #101112;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 18px rgba(199, 255, 61, 0.35);
+}
+
+.btn-electric-lime:hover {
+  background: #d4ff5c;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(199, 255, 61, 0.45);
+}
+
+.btn-electric-lime:active {
+  transform: scale(0.97);
+}
+
+.btn-glass-subtle {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: var(--primary-text);
+  transition: all 0.2s ease;
+}
+
+.btn-glass-subtle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.20);
+}
+
+.btn-glass-subtle:active {
+  transform: scale(0.97);
+}
+
+/* High-Readability Numeric Set Inputs */
+.set-number-input {
+  background: #141617;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--primary-text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.set-number-input:focus {
+  outline: none;
+  background: #181a1b;
+  border-color: var(--primary-accent) !important;
+  box-shadow: 0 0 0 2px rgba(199, 255, 61, 0.25);
+}
+
+/* Number spin button suppression */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Tabular Numerals for stats */
+.tabular-numbers {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
