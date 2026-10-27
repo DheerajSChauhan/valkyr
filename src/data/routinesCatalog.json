@@ -1,0 +1,396 @@
+[
+  {
+    "id": "phul-4day",
+    "title": "PHUL: Power Hypertrophy Upper Lower",
+    "shortTitle": "PHUL 4-Day",
+    "author": "Brandon Campbell",
+    "daysPerWeek": 4,
+    "daysBadge": "4 Days / Week",
+    "goal": "Power & Hypertrophy",
+    "goalBadge": "Power & Hypertrophy",
+    "level": "Intermediate",
+    "equipment": "Full Gym",
+    "duration": "55–70 mins",
+    "splitType": "Upper / Lower",
+    "description": "Combines raw compound strength progression on heavy days with lengthened-biased hypertrophy volume on secondary days.",
+    "coverImage": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
+    "tags": ["4-Day", "Upper / Lower", "Strength", "Hypertrophy"],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Upper Power",
+        "focus": "Upper Body Heavy Compounds (3-5 Reps)",
+        "exercises": [
+          { "name": "Barbell Bench Press", "sets": 4, "reps": "3-5 reps", "rest": "180s", "targetMuscle": "Chest", "notes": "Heavy strength anchor. Pause at chest." },
+          { "name": "Incline Dumbbell Press", "sets": 3, "reps": "6-10 reps", "rest": "120s", "targetMuscle": "Upper Chest", "notes": "30° incline bench for clavicular head bias." },
+          { "name": "Bent Over Barbell Row", "sets": 4, "reps": "3-5 reps", "rest": "150s", "targetMuscle": "Back", "notes": "Torso locked at 45°. Explode up with lats." },
+          { "name": "Lat Pulldown", "sets": 3, "reps": "6-10 reps", "rest": "90s", "targetMuscle": "Lats", "notes": "Full scapular depression and stretch at top." },
+          { "name": "Overhead Barbell Press", "sets": 3, "reps": "5-8 reps", "rest": "120s", "targetMuscle": "Shoulders", "notes": "Strict form, glutes squeezed tight." },
+          { "name": "Barbell Biceps Curl", "sets": 3, "reps": "6-10 reps", "rest": "90s", "targetMuscle": "Biceps", "notes": "Strict arm curl, control eccentric 2s." },
+          { "name": "Skull Crusher (EZ Bar)", "sets": 3, "reps": "6-10 reps", "rest": "90s", "targetMuscle": "Triceps", "notes": "Lower behind forehead for long head stretch." }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Lower Power",
+        "focus": "Posterior & Quad Max Overload",
+        "exercises": [
+          { "name": "Barbell Back Squat", "sets": 4, "reps": "3-5 reps", "rest": "180s", "targetMuscle": "Quads", "notes": "Hit parallel or below. Maintain bracing." },
+          { "name": "Conventional Deadlift", "sets": 3, "reps": "3-5 reps", "rest": "180s", "targetMuscle": "Hamstrings", "notes": "Reset each rep on floor. Neutral spine." },
+          { "name": "Leg Press", "sets": 3, "reps": "10-15 reps", "rest": "120s", "targetMuscle": "Quads", "notes": "Full ROM without pelvic tilt." },
+          { "name": "Lying Leg Curl", "sets": 3, "reps": "6-10 reps", "rest": "90s", "targetMuscle": "Hamstrings", "notes": "Keep hips pinned down throughout curl." },
+          { "name": "Standing Calf Raise", "sets": 4, "reps": "6-10 reps", "rest": "90s", "targetMuscle": "Calves", "notes": "2 second deep stretch at bottom of rep." }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Upper Hypertrophy",
+        "focus": "High Density & Fiber Recruitment",
+        "exercises": [
+          { "name": "Incline Barbell Bench Press", "sets": 4, "reps": "8-12 reps", "rest": "90s", "targetMuscle": "Upper Chest", "notes": "Touch collarbone, smooth tempo." },
+          { "name": "Flat Dumbbell Flye", "sets": 3, "reps": "10-12 reps", "rest": "75s", "targetMuscle": "Chest", "notes": "Deep loaded stretch in bottom position." },
+          { "name": "Seated Cable Row", "sets": 4, "reps": "8-12 reps", "rest": "90s", "targetMuscle": "Upper Back", "notes": "Pull with elbows, full contraction." },
+          { "name": "One-Arm Dumbbell Row", "sets": 3, "reps": "8-12 reps", "rest": "75s", "targetMuscle": "Lats", "notes": "Arc dumbbell back toward hip pocket." },
+          { "name": "Dumbbell Lateral Raise", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Lateral Delts", "notes": "Lead with elbows in scapular plane." },
+          { "name": "Incline Dumbbell Curl", "sets": 3, "reps": "10-12 reps", "rest": "75s", "targetMuscle": "Biceps", "notes": "Lengthened position stretch for biceps." },
+          { "name": "Cable Triceps Pushdown", "sets": 3, "reps": "10-12 reps", "rest": "60s", "targetMuscle": "Triceps", "notes": "Flare rope apart at lockout." }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "dayTitle": "Day 4: Lower Hypertrophy",
+        "focus": "Metabolic Stress & Quad/Glute Pump",
+        "exercises": [
+          { "name": "Front Squat (or Hack Squat)", "sets": 4, "reps": "8-12 reps", "rest": "120s", "targetMuscle": "Quads", "notes": "Upright torso, maximum knee flexion." },
+          { "name": "Barbell Romanian Deadlift", "sets": 3, "reps": "8-12 reps", "rest": "90s", "targetMuscle": "Hamstrings", "notes": "Hinge until intense hamstring stretch." },
+          { "name": "Dumbbell Walking Lunges", "sets": 3, "reps": "10-12 reps/leg", "rest": "90s", "targetMuscle": "Glutes", "notes": "Moderate forward torso lean for glute bias." },
+          { "name": "Leg Extension", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Quads", "notes": "Pause at peak contraction. Last set failure." },
+          { "name": "Seated Calf Raise", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Calves", "notes": "Soleus bias. Slow negative." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "classic-ppl-6day",
+    "title": "Classic 6-Day Push Pull Legs (PPL)",
+    "shortTitle": "Classic 6-Day PPL",
+    "author": "Push Pull Legs Gold Standard",
+    "daysPerWeek": 6,
+    "daysBadge": "6 Days / Week",
+    "goal": "Max Hypertrophy",
+    "goalBadge": "Max Hypertrophy",
+    "level": "Intermediate",
+    "equipment": "Full Gym",
+    "duration": "60–75 mins",
+    "splitType": "Push Pull Legs (PPL)",
+    "description": "The quintessential bodybuilding split hitting each muscle group twice every 7 days with alternating heavy and hypertrophy days.",
+    "coverImage": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80",
+    "tags": ["6-Day", "PPL", "Hypertrophy", "Strength"],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Push A (Heavy Bench Focus)",
+        "focus": "Chest, Front Delts & Triceps Overload",
+        "exercises": [
+          { "name": "Barbell Bench Press", "sets": 4, "reps": "5 reps", "rest": "180s", "targetMuscle": "Chest", "notes": "Heavy sets. Focus on arch and leg drive." },
+          { "name": "Overhead Barbell Press", "sets": 3, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Shoulders", "notes": "Strict overhead press." },
+          { "name": "Incline Dumbbell Press", "sets": 3, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Upper Chest", "notes": "Controlled descent." },
+          { "name": "Cable Lateral Raise", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Lateral Delts", "notes": "Constant cable tension." },
+          { "name": "Triceps Rope Pushdown", "sets": 3, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Triceps", "notes": "Last set to muscular failure." }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Pull A (Deadlift & Lat Focus)",
+        "focus": "Posterior Chain, Width & Biceps",
+        "exercises": [
+          { "name": "Conventional Barbell Deadlift", "sets": 3, "reps": "5 reps", "rest": "180s", "targetMuscle": "Hamstrings", "notes": "Power pull off floor." },
+          { "name": "Chest-Supported T-Bar Row", "sets": 4, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Upper Back", "notes": "Elbows driven back." },
+          { "name": "Neutral-Grip Lat Pulldown", "sets": 3, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Lats", "notes": "Deep stretch overhead." },
+          { "name": "Cable Face Pull", "sets": 4, "reps": "15-20 reps", "rest": "60s", "targetMuscle": "Rear Delts", "notes": "Pull rope to forehead with external rotation." },
+          { "name": "Incline Dumbbell Biceps Curl", "sets": 4, "reps": "10-12 reps", "rest": "60s", "targetMuscle": "Biceps", "notes": "Full arm extension." }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Legs A (Squat Anchor)",
+        "focus": "Heavy Squats & Quad Dominance",
+        "exercises": [
+          { "name": "Barbell Back Squat", "sets": 4, "reps": "6 reps", "rest": "180s", "targetMuscle": "Quads", "notes": "Clean depth and explosive ascent." },
+          { "name": "Romanian Deadlift", "sets": 3, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Hamstrings", "notes": "Focus on hip crease hinge." },
+          { "name": "Angled Leg Press", "sets": 3, "reps": "12-15 reps", "rest": "90s", "targetMuscle": "Quads", "notes": "Shoulder width stance." },
+          { "name": "Lying Hamstring Leg Curl", "sets": 3, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Hamstrings", "notes": "Squeeze peak contraction." },
+          { "name": "Standing Calf Machine", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Calves", "notes": "Full stretch at bottom." }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "dayTitle": "Day 4: Push B (Shoulder Overhead Focus)",
+        "focus": "Delts, Upper Chest & Triceps Lockout",
+        "exercises": [
+          { "name": "Standing Overhead Press", "sets": 4, "reps": "6 reps", "rest": "150s", "targetMuscle": "Shoulders", "notes": "Compound press." },
+          { "name": "Flat Dumbbell Bench Press", "sets": 4, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Chest", "notes": "Deep chest stretch." },
+          { "name": "Cable Incline Flye", "sets": 3, "reps": "12-15 reps", "rest": "75s", "targetMuscle": "Upper Chest", "notes": "Continuous tension." },
+          { "name": "Dumbbell Lateral Raise", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Lateral Delts", "notes": "Strict form." },
+          { "name": "Overhead Cable Triceps Ext", "sets": 3, "reps": "12 reps", "rest": "60s", "targetMuscle": "Triceps", "notes": "Long head emphasis." }
+        ]
+      },
+      {
+        "dayNumber": 5,
+        "dayTitle": "Day 5: Pull B (Weighted Chins & Density)",
+        "focus": "Upper Back Thickness & Peak Biceps",
+        "exercises": [
+          { "name": "Weighted Pull-Up", "sets": 4, "reps": "6-8 reps", "rest": "150s", "targetMuscle": "Lats", "notes": "Add plate on belt or do strict bodyweight." },
+          { "name": "Barbell Bent Over Row", "sets": 4, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Upper Back", "notes": "Underhand or overhand." },
+          { "name": "Close-Grip Seated Cable Row", "sets": 3, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Lats", "notes": "Squeeze scapulae." },
+          { "name": "Dumbbell Rear Delt Flye", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Rear Delts", "notes": "Chest supported on bench." },
+          { "name": "Barbell EZ-Curl", "sets": 3, "reps": "10-12 reps", "rest": "60s", "targetMuscle": "Biceps", "notes": "Strict curls." }
+        ]
+      },
+      {
+        "dayNumber": 6,
+        "dayTitle": "Day 6: Legs B (Posterior Chain & Calves)",
+        "focus": "RDLs, Lunges & Hamstrings",
+        "exercises": [
+          { "name": "Barbell Front Squat", "sets": 4, "reps": "8 reps", "rest": "150s", "targetMuscle": "Quads", "notes": "Deep quad recruitment." },
+          { "name": "Barbell Hip Thrust", "sets": 3, "reps": "10-12 reps", "rest": "120s", "targetMuscle": "Glutes", "notes": "Pause at top lockout." },
+          { "name": "Walking Dumbbell Lunges", "sets": 3, "reps": "12 reps/leg", "rest": "90s", "targetMuscle": "Quads", "notes": "Smooth stride." },
+          { "name": "Seated Leg Curl", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Hamstrings", "notes": "Last set dropset." },
+          { "name": "Donkey Calf Raise / Machine", "sets": 4, "reps": "15-20 reps", "rest": "60s", "targetMuscle": "Calves", "notes": "Burnout set." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "arnold-split",
+    "title": "The Golden Era Arnold Split",
+    "shortTitle": "Arnold Split",
+    "author": "Arnold Schwarzenegger",
+    "daysPerWeek": 6,
+    "daysBadge": "6 Days / Week",
+    "goal": "Aesthetics & Volume",
+    "goalBadge": "Aesthetics & Volume",
+    "level": "Advanced",
+    "equipment": "Full Gym",
+    "duration": "65–80 mins",
+    "splitType": "Chest/Back & Shoulders/Arms",
+    "description": "Antagonistic pairing split pairing Chest with Back, and Shoulders with Arms, delivering unprecedented blood volume and classic golden-era v-taper aesthetics.",
+    "coverImage": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80",
+    "tags": ["6-Day", "Hypertrophy", "Aesthetics", "Volume"],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Chest & Back Antagonist Supersets",
+        "focus": "Opposing Muscle Pumping Matrix",
+        "exercises": [
+          { "name": "Barbell Bench Press", "sets": 4, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Chest", "notes": "Superset with Wide-Grip Chin-ups." },
+          { "name": "Wide-Grip Chin-Up", "sets": 4, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Lats", "notes": "Full lat spread stretch." },
+          { "name": "Incline Barbell Bench Press", "sets": 4, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Upper Chest", "notes": "Superset with Barbell Bent Row." },
+          { "name": "Barbell Bent Over Row", "sets": 4, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Upper Back", "notes": "Strict back squeeze." },
+          { "name": "Dumbbell Pullover", "sets": 3, "reps": "12-15 reps", "rest": "75s", "targetMuscle": "Chest & Lats", "notes": "Classic Arnold rib cage expander." }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Shoulders & Arms",
+        "focus": "Full Delts, Biceps Peak & Horseshoe Triceps",
+        "exercises": [
+          { "name": "Standing Overhead Barbell Press", "sets": 4, "reps": "8 reps", "rest": "120s", "targetMuscle": "Shoulders", "notes": "Heavy shoulder driver." },
+          { "name": "Seated Dumbbell Arnold Press", "sets": 3, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Shoulders", "notes": "Rotate palms inward at bottom." },
+          { "name": "Dumbbell Lateral Raise", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Lateral Delts", "notes": "Constant delt tension." },
+          { "name": "Barbell Biceps Cheat Curl", "sets": 4, "reps": "8-10 reps", "rest": "90s", "targetMuscle": "Biceps", "notes": "Strict eccentric lowering." },
+          { "name": "Close-Grip Bench Press", "sets": 4, "reps": "8-10 reps", "rest": "90s", "targetMuscle": "Triceps", "notes": "Triceps overload." },
+          { "name": "Dumbbell Hammer Curls", "sets": 3, "reps": "12 reps", "rest": "60s", "targetMuscle": "Brachialis", "notes": "Forearm and arm thickness." }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Legs & Core",
+        "focus": "High Rep Squats & Calves",
+        "exercises": [
+          { "name": "Barbell Back Squat", "sets": 5, "reps": "8-12 reps", "rest": "150s", "targetMuscle": "Quads", "notes": "Deep squats for massive wheels." },
+          { "name": "Stiff-Legged Deadlift", "sets": 4, "reps": "10-12 reps", "rest": "120s", "targetMuscle": "Hamstrings", "notes": "Stretches lower hamstrings." },
+          { "name": "Leg Extension", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Quads", "notes": "Peak contraction burn." },
+          { "name": "Lying Leg Curl", "sets": 4, "reps": "12 reps", "rest": "60s", "targetMuscle": "Hamstrings", "notes": "Controlled negatives." },
+          { "name": "Standing Calf Raise", "sets": 5, "reps": "15-20 reps", "rest": "60s", "targetMuscle": "Calves", "notes": "High rep pump." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wendler-531",
+    "title": "5/3/1 for Beginners",
+    "shortTitle": "5/3/1 Beginners",
+    "author": "Jim Wendler",
+    "daysPerWeek": 3,
+    "daysBadge": "3 Days / Week",
+    "goal": "Raw Strength",
+    "goalBadge": "Raw Strength",
+    "level": "Beginner",
+    "equipment": "Barbell & Dumbbells",
+    "duration": "45–60 mins",
+    "splitType": "Strength",
+    "description": "The world-famous strength methodology focused on submaximal percentage loading, steady PR setting, and balanced bodyweight/dumbbell assistance.",
+    "coverImage": "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=800&q=80",
+    "tags": ["3-Day", "Strength", "Barbell"],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Squat & Bench Wave",
+        "focus": "Squat 5/3/1 + Bench 5/3/1 + Assistance",
+        "exercises": [
+          { "name": "Barbell Back Squat", "sets": 3, "reps": "5/3/1+ reps", "rest": "180s", "targetMuscle": "Quads", "notes": "Main lift wave. Final set AMRAP (As Many Reps As Possible)." },
+          { "name": "Barbell Bench Press", "sets": 3, "reps": "5/3/1+ reps", "rest": "180s", "targetMuscle": "Chest", "notes": "Main lift wave. Final set AMRAP." },
+          { "name": "Dumbbell Row Assistance", "sets": 5, "reps": "10 reps", "rest": "90s", "targetMuscle": "Back", "notes": "Pull assistance (50 total reps)." },
+          { "name": "Dips or Pushups", "sets": 5, "reps": "10 reps", "rest": "60s", "targetMuscle": "Triceps", "notes": "Push assistance (50 total reps)." },
+          { "name": "Hanging Knee Raise", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Core", "notes": "Single-leg/Core assistance." }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Deadlift & Overhead Press Wave",
+        "focus": "Deadlift 5/3/1 + Press 5/3/1 + Assistance",
+        "exercises": [
+          { "name": "Barbell Deadlift", "sets": 3, "reps": "5/3/1+ reps", "rest": "180s", "targetMuscle": "Hamstrings", "notes": "Main lift wave. AMRAP on top set." },
+          { "name": "Standing Overhead Press", "sets": 3, "reps": "5/3/1+ reps", "rest": "180s", "targetMuscle": "Shoulders", "notes": "Strict press wave. AMRAP on top set." },
+          { "name": "Lat Pulldown or Chin-ups", "sets": 5, "reps": "10 reps", "rest": "90s", "targetMuscle": "Lats", "notes": "Pull assistance." },
+          { "name": "Dumbbell Incline Bench", "sets": 4, "reps": "12 reps", "rest": "75s", "targetMuscle": "Upper Chest", "notes": "Push assistance." },
+          { "name": "Bulgarian Split Squat", "sets": 3, "reps": "10 reps/leg", "rest": "90s", "targetMuscle": "Quads", "notes": "Single leg balance." }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Bench & Squat Volume",
+        "focus": "Secondary Strength Practice + Hypertrophy",
+        "exercises": [
+          { "name": "Barbell Bench Press (5x5 FSL)", "sets": 5, "reps": "5 reps", "rest": "120s", "targetMuscle": "Chest", "notes": "First Set Last (FSL) percentage." },
+          { "name": "Barbell Back Squat (5x5 FSL)", "sets": 5, "reps": "5 reps", "rest": "120s", "targetMuscle": "Quads", "notes": "First Set Last speed sets." },
+          { "name": "Chest-Supported Machine Row", "sets": 4, "reps": "12 reps", "rest": "75s", "targetMuscle": "Back", "notes": "Strict pull." },
+          { "name": "Triceps Rope Pushdown", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Triceps", "notes": "Arm finisher." },
+          { "name": "Abdominal Cable Crunch", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Core", "notes": "Heavy core flexion." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "upper-lower-4day",
+    "title": "Upper / Lower 4-Day Strength & Size",
+    "shortTitle": "Upper / Lower 4-Day",
+    "author": "Dr. Eric Helms / 3DMJ",
+    "daysPerWeek": 4,
+    "daysBadge": "4 Days / Week",
+    "goal": "Strength & Hypertrophy",
+    "goalBadge": "Strength & Hypertrophy",
+    "level": "Intermediate",
+    "equipment": "Full Gym",
+    "duration": "50–65 mins",
+    "splitType": "Upper / Lower",
+    "description": "Scientific periodization with dedicated Upper A/B and Lower A/B microcycles optimizing frequency and recovery.",
+    "coverImage": "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=800&q=80",
+    "tags": ["4-Day", "Upper / Lower", "Strength", "Hypertrophy"],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Upper A (Horizontal Push/Pull)",
+        "focus": "Bench Press, Cable Rows & Delt Overload",
+        "exercises": [
+          { "name": "Barbell Bench Press", "sets": 4, "reps": "6-8 reps", "rest": "150s", "targetMuscle": "Chest", "notes": "Heavy horizontal press." },
+          { "name": "Chest Supported T-Bar Row", "sets": 4, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Upper Back", "notes": "Wide grip for rhomboids." },
+          { "name": "Incline Dumbbell Press", "sets": 3, "reps": "8-12 reps", "rest": "90s", "targetMuscle": "Upper Chest", "notes": "Clavicular head emphasis." },
+          { "name": "Cable Lat Pulldown", "sets": 3, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Lats", "notes": "Pronated medium grip." },
+          { "name": "Dumbbell Lateral Raise", "sets": 4, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Lateral Delts", "notes": "Strict elevation." },
+          { "name": "Overhead Cable Extension", "sets": 3, "reps": "12 reps", "rest": "60s", "targetMuscle": "Triceps", "notes": "Triceps pump." }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Lower A (Squat Emphasis)",
+        "focus": "Back Squats, RDLs & Calves",
+        "exercises": [
+          { "name": "Barbell Back Squat", "sets": 4, "reps": "6-8 reps", "rest": "180s", "targetMuscle": "Quads", "notes": "Strength foundation." },
+          { "name": "Barbell Romanian Deadlift", "sets": 3, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Hamstrings", "notes": "Posterior chain loading." },
+          { "name": "Leg Press", "sets": 3, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Quads", "notes": "Feet low on platform." },
+          { "name": "Lying Leg Curl", "sets": 3, "reps": "10-12 reps", "rest": "60s", "targetMuscle": "Hamstrings", "notes": "Isolate knee flexion." },
+          { "name": "Standing Calf Raise", "sets": 4, "reps": "10-15 reps", "rest": "60s", "targetMuscle": "Calves", "notes": "Hold stretch at bottom." }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Upper B (Vertical Push/Pull)",
+        "focus": "Overhead Press, Pull-ups & Arm Density",
+        "exercises": [
+          { "name": "Standing Overhead Press", "sets": 4, "reps": "6-8 reps", "rest": "150s", "targetMuscle": "Shoulders", "notes": "Strict vertical drive." },
+          { "name": "Neutral Grip Pull-Up", "sets": 4, "reps": "6-8 reps", "rest": "120s", "targetMuscle": "Lats", "notes": "Full ROM bodyweight or weighted." },
+          { "name": "Flat Dumbbell Press", "sets": 3, "reps": "8-12 reps", "rest": "90s", "targetMuscle": "Chest", "notes": "Deep loaded stretch." },
+          { "name": "Cable Seated Row", "sets": 3, "reps": "10-12 reps", "rest": "90s", "targetMuscle": "Lats", "notes": "Close V-bar grip." },
+          { "name": "Cable Rear Delt Flye", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Rear Delts", "notes": "Scapular plane." },
+          { "name": "Incline Dumbbell Biceps Curl", "sets": 3, "reps": "10-12 reps", "rest": "60s", "targetMuscle": "Biceps", "notes": "Long head stretch." }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "dayTitle": "Day 4: Lower B (Deadlift Emphasis)",
+        "focus": "Deadlifts, Front Squats & Hamstrings",
+        "exercises": [
+          { "name": "Barbell Conventional Deadlift", "sets": 4, "reps": "5 reps", "rest": "180s", "targetMuscle": "Hamstrings", "notes": "Power pull from dead stop." },
+          { "name": "Front Squat (or Hack Squat)", "sets": 3, "reps": "8-10 reps", "rest": "120s", "targetMuscle": "Quads", "notes": "Quad loading." },
+          { "name": "Dumbbell Walking Lunges", "sets": 3, "reps": "10 reps/leg", "rest": "90s", "targetMuscle": "Glutes", "notes": "Controlled descent." },
+          { "name": "Seated Hamstring Leg Curl", "sets": 3, "reps": "12-15 reps", "rest": "60s", "targetMuscle": "Hamstrings", "notes": "Constant tension." },
+          { "name": "Seated Calf Raise", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Calves", "notes": "Slow negative." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gvt-10x10",
+    "title": "German Volume Training (10x10)",
+    "shortTitle": "GVT 10x10",
+    "author": "Charles Poliquin",
+    "daysPerWeek": 4,
+    "daysBadge": "4 Days / Week",
+    "goal": "Metabolic Hypertrophy",
+    "goalBadge": "Max Muscle Mass",
+    "level": "Advanced",
+    "equipment": "Full Gym",
+    "duration": "60–75 mins",
+    "splitType": "Hypertrophy",
+    "description": "The brutal 10 sets of 10 reps protocol designed for rapid mass acquisition using 60% 1RM and 60-90s rest intervals.",
+    "coverImage": "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=800&q=80",
+    "tags": ["4-Day", "Hypertrophy", "High Volume"],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Chest & Back (10x10 Antagonist)",
+        "focus": "100 Reps Bench Press + 100 Reps Barbell Row",
+        "exercises": [
+          { "name": "Barbell Bench Press", "sets": 10, "reps": "10 reps", "rest": "90s", "targetMuscle": "Chest", "notes": "60% 1RM. Maintain same weight across all 10 sets." },
+          { "name": "Barbell Bent Over Row", "sets": 10, "reps": "10 reps", "rest": "90s", "targetMuscle": "Upper Back", "notes": "Antagonist pair with bench press." },
+          { "name": "Incline Dumbbell Flye", "sets": 3, "reps": "10-12 reps", "rest": "60s", "targetMuscle": "Upper Chest", "notes": "Accessory stretch." },
+          { "name": "One-Arm Dumbbell Row", "sets": 3, "reps": "10-12 reps", "rest": "60s", "targetMuscle": "Lats", "notes": "Accessory squeeze." }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Legs & Abs (10x10 Squats)",
+        "focus": "100 Reps Back Squat + 100 Reps Lying Leg Curl",
+        "exercises": [
+          { "name": "Barbell Back Squat", "sets": 10, "reps": "10 reps", "rest": "90s", "targetMuscle": "Quads", "notes": "60% 1RM. Constant tempo, explosive ascent." },
+          { "name": "Lying Leg Curl", "sets": 10, "reps": "10 reps", "rest": "90s", "targetMuscle": "Hamstrings", "notes": "Antagonist knee flexion." },
+          { "name": "Hanging Leg Raise", "sets": 4, "reps": "12 reps", "rest": "60s", "targetMuscle": "Core", "notes": "Core accessory." },
+          { "name": "Standing Calf Machine", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Calves", "notes": "Deep calf stretch." }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Shoulders & Arms (10x10 Dips/Chins)",
+        "focus": "100 Reps Dips + 100 Reps Chin-Ups",
+        "exercises": [
+          { "name": "Triceps Parallel Dips", "sets": 10, "reps": "10 reps", "rest": "90s", "targetMuscle": "Triceps", "notes": "Antagonist superset with chin-ups." },
+          { "name": "Underhand Chin-Up", "sets": 10, "reps": "10 reps", "rest": "90s", "targetMuscle": "Biceps", "notes": "Full stretch at bottom." },
+          { "name": "Seated Dumbbell Lateral Raise", "sets": 4, "reps": "12 reps", "rest": "60s", "targetMuscle": "Lateral Delts", "notes": "Shoulder accessory." },
+          { "name": "Cable Face Pull", "sets": 4, "reps": "15 reps", "rest": "60s", "targetMuscle": "Rear Delts", "notes": "Rear delt posture finisher." }
+        ]
+      }
+    ]
+  }
+]

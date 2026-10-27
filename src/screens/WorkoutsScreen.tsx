@@ -26,7 +26,13 @@ import { HevyRoutineBuilderModal } from '../components/workout/HevyRoutineBuilde
 import { CustomProgramModal } from '../components/planner/CustomProgramModal';
 import { CustomExerciseModal } from '../components/workout/CustomExerciseModal';
 import { ExerciseDirectoryView } from '../components/workout/ExerciseDirectoryView';
-import { Equipment } from '../types';
+import { Equipment, CatalogRoutinePlan } from '../types';
+import rawRoutines from '../data/routinesCatalog.json';
+import { FamousSplitsCarousel } from '../components/workout/FamousSplitsCarousel';
+import { RoutinePreviewModal } from '../components/workout/RoutinePreviewModal';
+import { RoutineVaultModal } from '../components/workout/RoutineVaultModal';
+
+const catalogRoutines = rawRoutines as CatalogRoutinePlan[];
 
 // --- CURATED ATHLETIC IMAGERY (High-Performance Athletics) ---
 const IMAGES = {
@@ -36,6 +42,10 @@ const IMAGES = {
   gym: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
   pilates: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&w=1200&q=80",
   mobility: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80",
+  ppl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
+  upper_lower: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=80",
+  hypertrophy: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+  home_dumbbell: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1200&q=80",
   thumbnails: [
     "https://images.unsplash.com/photo-1534367507873-d2d7e24c797f?auto=format&fit=crop&w=400&q=80",
     "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=400&q=80",
@@ -62,10 +72,10 @@ export interface AthleticExercise {
 export interface AthleticWorkout {
   id: string;
   title: string;
-  category: 'gym' | 'strength' | 'hiit' | 'yoga' | 'pilates' | 'mobility';
+  category: 'ppl' | 'upper_lower' | 'strength' | 'hypertrophy' | 'home_dumbbell' | 'gym' | 'hiit' | 'yoga' | 'pilates' | 'mobility';
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   equipment: 'None' | 'Basic Equipment' | 'Full Equipment';
-  focus: 'Strength' | 'Endurance' | 'Mobility' | 'Power';
+  focus: 'Strength' | 'Endurance' | 'Mobility' | 'Power' | 'Hypertrophy';
   durationMin: number;
   thumbnail: string;
   description: string;
@@ -73,14 +83,16 @@ export interface AthleticWorkout {
   isCustom?: boolean;
 }
 
+// Updated Categories prioritizing Strength & Hypertrophy splits
 const CATEGORIES = [
-  { id: 'hiit', name: 'HIIT', image: IMAGES.hiit, count: 42, subtitle: 'High intensity cardiovascular threshold training' },
-  { id: 'strength', name: 'Strength', image: IMAGES.strength, count: 96, subtitle: 'Progressive overload compound hypertrophy' },
-  { id: 'yoga', name: 'Yoga', image: IMAGES.yoga, count: 38, subtitle: 'Vinyasa flow, balance and breathwork' },
-  { id: 'gym', name: 'For The Gym', image: IMAGES.gym, count: 189, heroDesc: "Strength starts here: explore gym-ready barbell, cable and dumbbell workouts.", subtitle: 'Barbell, dumbbell & machine overload routines' },
-  { id: 'pilates', name: 'Pilates', image: IMAGES.pilates, count: 24, subtitle: 'Deep core stability and pelvic alignment' },
-  { id: 'mobility', name: 'Mobility & Recovery', image: IMAGES.mobility, count: 31, subtitle: 'Joint longevity, tissue release and de-load' }
+  { id: 'ppl', name: 'Push Pull Legs (PPL)', image: IMAGES.ppl, count: 142, subtitle: 'Chest/Shoulders/Triceps, Back/Biceps & Quad/Hamstring split' },
+  { id: 'upper_lower', name: 'Upper / Lower', image: IMAGES.upper_lower, count: 118, subtitle: '4-day power and hypertrophy balanced overload system' },
+  { id: 'strength', name: 'Strength', image: IMAGES.strength, count: 96, subtitle: 'Progressive overload compound barbell & heavy dumbbell anchors' },
+  { id: 'hypertrophy', name: 'Hypertrophy', image: IMAGES.hypertrophy, count: 154, subtitle: 'Lengthened-position biomechanical muscle growth protocols' },
+  { id: 'home_dumbbell', name: 'Home & Dumbbell', image: IMAGES.home_dumbbell, count: 68, subtitle: 'Minimalist dumbbell, bodyweight & resistance band hypertrophy' },
+  { id: 'gym', name: 'For The Gym', image: IMAGES.gym, count: 189, heroDesc: "Strength starts here: explore gym-ready barbell, cable and dumbbell workouts.", subtitle: 'Barbell, dumbbell & machine overload routines' }
 ];
+
 
 const INITIAL_WORKOUTS: AthleticWorkout[] = [
   {
@@ -268,6 +280,11 @@ export const WorkoutsScreen: React.FC = () => {
   const [filterDuration, setFilterDuration] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Quick-Filter Chips: [All], [3-Day], [4-Day], [PPL], [Hypertrophy], [Strength]
+  const [quickFilter, setQuickFilter] = useState<'All' | '3-Day' | '4-Day' | 'PPL' | 'Hypertrophy' | 'Strength'>('All');
+  const [isRoutineVaultOpen, setIsRoutineVaultOpen] = useState(false);
+  const [selectedCatalogRoutine, setSelectedCatalogRoutine] = useState<CatalogRoutinePlan | null>(null);
+
   // Active In-Workout Tracking State
   const [isLiveWorkoutOpen, setIsLiveWorkoutOpen] = useState(false);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
@@ -292,10 +309,22 @@ export const WorkoutsScreen: React.FC = () => {
     // Include workouts from context
     contextWorkouts.forEach((cw, idx) => {
       let cat: AthleticWorkout['category'] = 'gym';
-      if (cw.category === 'Strength' || cw.category === 'Hypertrophy') cat = 'strength';
-      else if (cw.category === 'Cardio' || cw.category === 'Fat Loss') cat = 'hiit';
-      else if (cw.category === 'Mobility' || cw.category === 'Recovery') cat = 'mobility';
-      else cat = 'gym';
+      const titleLower = cw.title.toLowerCase();
+      const subtitleLower = (cw.subtitle || '').toLowerCase();
+
+      if (titleLower.includes('ppl') || titleLower.includes('push') || titleLower.includes('pull') || titleLower.includes('legs')) {
+        cat = 'ppl';
+      } else if (titleLower.includes('upper') || titleLower.includes('lower')) {
+        cat = 'upper_lower';
+      } else if (cw.category === 'Strength') {
+        cat = 'strength';
+      } else if (cw.category === 'Hypertrophy') {
+        cat = 'hypertrophy';
+      } else if (cw.equipment?.includes('Bodyweight') || (cw.equipment?.includes('Dumbbells') && cw.equipment.length <= 2)) {
+        cat = 'home_dumbbell';
+      } else {
+        cat = 'gym';
+      }
 
       let eq: AthleticWorkout['equipment'] = 'Full Equipment';
       if (cw.equipment?.includes('Bodyweight') && cw.equipment.length === 1) eq = 'None';
@@ -307,7 +336,7 @@ export const WorkoutsScreen: React.FC = () => {
         category: cat,
         level: cw.level,
         equipment: eq,
-        focus: cw.category === 'Strength' ? 'Strength' : 'Endurance',
+        focus: cw.category === 'Strength' ? 'Strength' : 'Hypertrophy',
         durationMin: cw.durationMin || 45,
         thumbnail: cw.image || IMAGES.thumbnails[idx % IMAGES.thumbnails.length],
         description: cw.subtitle || 'Progressive overload session calibrated for hypertrophy and athletic longevity.',
@@ -384,7 +413,7 @@ export const WorkoutsScreen: React.FC = () => {
     showToast(`🏆 Great session! "${selectedWorkout?.title}" completed!`);
   };
 
-  // Filtered workouts
+  // Filtered workouts with quick-filter and search support
   const filteredWorkouts = useMemo(() => {
     return enrichedWorkouts.filter(w => {
       if (selectedCategory && currentScreen === 'category' && w.category !== selectedCategory) {
@@ -405,19 +434,46 @@ export const WorkoutsScreen: React.FC = () => {
       if (filterDuration === '< 30 min' && w.durationMin >= 30) return false;
       if (filterDuration === '30 - 45 min' && (w.durationMin < 30 || w.durationMin > 45)) return false;
       if (filterDuration === '45+ min' && w.durationMin < 45) return false;
-      if (searchQuery && !w.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
+
+      // Quick-filter chip filtering
+      if (quickFilter !== 'All') {
+        const titleLower = w.title.toLowerCase();
+        const descLower = (w.description || '').toLowerCase();
+        if (quickFilter === '3-Day') {
+          if (!titleLower.includes('3-day') && !descLower.includes('3 day') && w.durationMin > 50) return false;
+        } else if (quickFilter === '4-Day') {
+          if (w.category !== 'upper_lower' && !titleLower.includes('upper') && !titleLower.includes('lower') && !titleLower.includes('4-day')) return false;
+        } else if (quickFilter === 'PPL') {
+          if (w.category !== 'ppl' && !titleLower.includes('ppl') && !titleLower.includes('push') && !titleLower.includes('pull') && !titleLower.includes('legs')) return false;
+        } else if (quickFilter === 'Hypertrophy') {
+          if (w.category !== 'hypertrophy' && w.focus !== 'Hypertrophy' && !titleLower.includes('hypertrophy')) return false;
+        } else if (quickFilter === 'Strength') {
+          if (w.category !== 'strength' && w.focus !== 'Strength' && !titleLower.includes('strength')) return false;
+        }
       }
+
+      // Search query filtering
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const matchesTitle = w.title.toLowerCase().includes(q);
+        const matchesDesc = (w.description || '').toLowerCase().includes(q);
+        const matchesEx = w.exercises.some(e => e.name.toLowerCase().includes(q));
+        if (!matchesTitle && !matchesDesc && !matchesEx) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [enrichedWorkouts, selectedCategory, currentScreen, activeTabFilter, savedWorkoutIds, completedWorkoutIds, filterLevel, filterEquipment, filterDuration, searchQuery]);
+  }, [enrichedWorkouts, selectedCategory, currentScreen, activeTabFilter, savedWorkoutIds, completedWorkoutIds, filterLevel, filterEquipment, filterDuration, searchQuery, quickFilter]);
 
-  const currentCategoryData = CATEGORIES.find(c => c.id === selectedCategory) || CATEGORIES[3];
+  const currentCategoryData = CATEGORIES.find(c => c.id === selectedCategory) || CATEGORIES[0];
 
   const hasActiveFilters =
     filterLevel !== 'All' ||
     filterEquipment !== 'All' ||
     filterDuration !== 'All' ||
+    quickFilter !== 'All' ||
     Boolean(searchQuery);
 
   // Filtered exercises for Exercise Directory view
@@ -444,64 +500,116 @@ export const WorkoutsScreen: React.FC = () => {
       {currentScreen === 'home' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           
-          {/* Header Title & Quick Actions */}
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <div>
-              <div className="flex items-center gap-2">
-                <Dumbbell className="w-4 h-4 text-[#C7FF3D]" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#C7FF3D]">
-                  HYPERTROPHY & ATHLETIC LIBRARY
-                </span>
-              </div>
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
-                Workout Hub
-              </h1>
-              <p className="text-xs text-[#929895] font-medium mt-0.5">
-                Explore high-performance gym workouts, saved splits, or build custom routines
-              </p>
+          {/* Header Title & Subtitle */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Dumbbell className="w-4 h-4 text-[#C7FF3D]" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#C7FF3D]">
+                HYPERTROPHY & ATHLETIC LIBRARY
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
+              Workout Hub
+            </h1>
+            <p className="text-xs text-[#929895] font-medium mt-0.5">
+              Explore high-performance gym workouts, saved splits, or build custom routines
+            </p>
+          </div>
+
+          {/* 1. Global Search & Filter Bar right below Workout Hub title */}
+          <div className="space-y-2.5">
+            <div className="relative">
+              <Search className="w-4 h-4 text-[#929895] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search 1,000+ workouts, famous splits, movements..."
+                className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-[#151718] border border-white/10 text-xs text-white placeholder-[#929895] focus:outline-none focus:border-[#C7FF3D] transition shadow-inner"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => openGuidebook('guidelines')}
-                className="btn-glass-subtle px-3 py-1.5 rounded-xl text-xs font-black text-[#C7FF3D] border-[#C7FF3D]/30 hover:border-[#C7FF3D] flex items-center gap-1.5"
-              >
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>PDF Guide</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => startEmptyWorkout()}
-                className="btn-glass-subtle px-3 py-1.5 rounded-xl text-xs font-black text-white hover:text-[#C7FF3D] flex items-center gap-1.5"
-              >
-                <Zap className="w-3.5 h-3.5 text-[#C7FF3D]" />
-                <span>Empty Session</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowRoutineBuilder(true)}
-                className="btn-electric-lime px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>+ Custom Routine</span>
-              </button>
+            {/* Quick-Filter Chips: [All], [3-Day], [4-Day], [PPL], [Hypertrophy], [Strength] */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              {(['All', '3-Day', '4-Day', 'PPL', 'Hypertrophy', 'Strength'] as const).map(chip => {
+                const isActive = quickFilter === chip;
+                return (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => setQuickFilter(chip)}
+                    className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 border ${
+                      isActive
+                        ? 'bg-[#C7FF3D] text-[#101112] border-[#C7FF3D] shadow-md shadow-[#C7FF3D]/25 ring-1 ring-[#C7FF3D]/40'
+                        : 'bg-[#151718] text-[#929895] hover:text-white border-white/10 hover:border-white/20'
+                    }`}
+                  >
+                    {chip}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Secondary Navigation Pills: Directory & PDF Plans */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Action Buttons: PDF Guide, Empty Session, + Custom Routine */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => openGuidebook('guidelines')}
+              className="btn-glass-subtle px-3 py-1.5 rounded-xl text-xs font-black text-[#C7FF3D] border-[#C7FF3D]/30 hover:border-[#C7FF3D] flex items-center gap-1.5 active:scale-95 transition"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>PDF Guide</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => startEmptyWorkout()}
+              className="btn-glass-subtle px-3 py-1.5 rounded-xl text-xs font-black text-white hover:text-[#C7FF3D] flex items-center gap-1.5 active:scale-95 transition"
+            >
+              <Zap className="w-3.5 h-3.5 text-[#C7FF3D]" />
+              <span>Empty Session</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRoutineBuilder(true)}
+              className="btn-electric-lime px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>+ Custom Routine</span>
+            </button>
+          </div>
+
+          {/* 2. "Featured / Famous Splits" Carousel (Horizontal Scroll) */}
+          {/* Placed between Action Buttons and "Your Workouts" */}
+          <FamousSplitsCarousel
+            routines={catalogRoutines}
+            onSelectRoutine={routine => setSelectedCatalogRoutine(routine)}
+            activeFilter={quickFilter}
+          />
+
+          {/* 3. Routine Database Vault Link (Replacing generic Transformation Plans tile) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={() => setCurrentScreen('directory')}
-              className="p-3 rounded-2xl bg-[#161819] border border-white/[0.08] hover:border-[#C7FF3D]/40 transition text-left flex items-center justify-between group"
+              className="p-3.5 rounded-2xl bg-[#161819] border border-white/[0.08] hover:border-[#C7FF3D]/40 transition text-left flex items-center justify-between group active:scale-[0.99]"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/[0.05] flex items-center justify-center text-[#C7FF3D]">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-white/[0.05] flex items-center justify-center text-[#C7FF3D]">
                   <Search className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-white group-hover:text-[#C7FF3D] transition">
+                  <h4 className="text-xs sm:text-sm font-black text-white group-hover:text-[#C7FF3D] transition">
                     Exercise Directory
                   </h4>
                   <p className="text-[10px] text-[#929895]">
@@ -512,27 +620,91 @@ export const WorkoutsScreen: React.FC = () => {
               <ChevronRight className="w-4 h-4 text-[#929895] group-hover:translate-x-1 group-hover:text-white transition" />
             </button>
 
+            {/* Routine Vault (1,000+ Free Plans) prominent card */}
             <button
               type="button"
-              onClick={() => setShowCustomProgramModal(true)}
-              className="p-3 rounded-2xl bg-[#161819] border border-white/[0.08] hover:border-[#65D9C0]/40 transition text-left flex items-center justify-between group"
+              onClick={() => setIsRoutineVaultOpen(true)}
+              className="p-3.5 rounded-2xl bg-gradient-to-r from-[#172018] via-[#161819] to-[#161819] border border-[#C7FF3D]/30 hover:border-[#C7FF3D] transition text-left flex items-center justify-between group shadow-lg active:scale-[0.99]"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/[0.05] flex items-center justify-center text-[#65D9C0]">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#C7FF3D]/15 flex items-center justify-center text-[#C7FF3D]">
                   <Layers className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-white group-hover:text-[#65D9C0] transition">
-                    Transformation Plans
-                  </h4>
+                  <div className="flex items-center gap-1.5">
+                    <h4 className="text-xs sm:text-sm font-black text-white group-hover:text-[#C7FF3D] transition">
+                      Routine Vault (1,000+ Free Plans)
+                    </h4>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C7FF3D] animate-ping" />
+                  </div>
                   <p className="text-[10px] text-[#929895]">
-                    12-Week periodization & custom splits
+                    Browse by target muscle, training days, and equipment
                   </p>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-[#929895] group-hover:translate-x-1 group-hover:text-white transition" />
+              <ChevronRight className="w-4 h-4 text-[#C7FF3D] group-hover:translate-x-1 transition" />
             </button>
           </div>
+
+          {/* Active Search & Filter Results Preview (if search or quick filter active) */}
+          {(searchQuery || quickFilter !== 'All') && (
+            <div className="p-4 rounded-2xl bg-[#161819] border border-[#C7FF3D]/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#C7FF3D]" />
+                  <h3 className="text-xs font-black uppercase tracking-wider text-white">
+                    Matching Workouts ({filteredWorkouts.length} found)
+                  </h3>
+                  {quickFilter !== 'All' && (
+                    <span className="px-2 py-0.5 rounded-md bg-[#C7FF3D]/20 text-[#C7FF3D] text-[10px] font-bold">
+                      {quickFilter}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setQuickFilter('All');
+                  }}
+                  className="text-[10px] font-bold text-[#929895] hover:text-white"
+                >
+                  Clear Filters
+                </button>
+              </div>
+
+              {filteredWorkouts.length === 0 ? (
+                <p className="text-xs text-[#929895] py-2">
+                  No direct workouts matched your query. Check the Famous Splits carousel above or the Routine Vault!
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {filteredWorkouts.slice(0, 4).map(w => (
+                    <div
+                      key={w.id}
+                      onClick={() => handleStartWorkout(w)}
+                      className="p-3 rounded-xl bg-black/40 border border-white/5 hover:border-[#C7FF3D]/40 transition flex items-center justify-between gap-3 cursor-pointer group"
+                    >
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-black text-white group-hover:text-[#C7FF3D] truncate">
+                          {w.title}
+                        </h4>
+                        <p className="text-[10px] text-[#929895] truncate">
+                          {w.durationMin}m • {w.level} • {w.exercises.length} moves
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="px-2.5 py-1 rounded-lg bg-[#C7FF3D] text-[#101112] text-[10px] font-black shrink-0"
+                      >
+                        Start
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Section: Your Workouts (Horizontal Glass Cards) */}
           <div className="space-y-3">
@@ -1313,6 +1485,21 @@ export const WorkoutsScreen: React.FC = () => {
         isOpen={showCustomExerciseModal}
         onClose={() => setShowCustomExerciseModal(false)}
         onExerciseCreated={() => setShowCustomExerciseModal(false)}
+      />
+
+      {/* Routine Preview Modal (for Famous Splits & Vault Plans) */}
+      <RoutinePreviewModal
+        plan={selectedCatalogRoutine}
+        isOpen={Boolean(selectedCatalogRoutine)}
+        onClose={() => setSelectedCatalogRoutine(null)}
+      />
+
+      {/* Routine Database Vault (1,000+ Free Plans) */}
+      <RoutineVaultModal
+        isOpen={isRoutineVaultOpen}
+        onClose={() => setIsRoutineVaultOpen(false)}
+        routines={catalogRoutines}
+        onSelectRoutine={routine => setSelectedCatalogRoutine(routine)}
       />
     </div>
   );

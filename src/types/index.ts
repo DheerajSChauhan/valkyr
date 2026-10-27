@@ -395,3 +395,82 @@ export interface ActiveProgramProgress {
   completedSessionKeys: string[]; // e.g. 'w1-d1', 'w1-d2'
   preferredSwaps: Record<string, Exercise>; // keyed by original exercise id
 }
+
+export interface ActiveProgram {
+  id: string;
+  title: string;
+  author: string;
+  currentWeek: number;
+  currentDay: number;
+  routines: Workout[];
+}
+
+export interface MomentumStats {
+  targetSessions: number;
+  completedSessions: number;
+  weeklyVolumeKg: number;
+  volumeTrendPercent: number;
+  activeMinutes: number;
+  streakDays: number;
+}
+
+export interface LiveClubMember {
+  userId: string;
+  name: string;
+  avatarUrl: string;
+  currentExercise: string;
+  status: string;
+}
+
+export interface FeedActivityItem {
+  id: string;
+  athleteName: string;
+  athleteAvatar: string;
+  athleteHandle?: string;
+  sessionTitle: string;
+  volumeKg: number;
+  durationMinutes: number;
+  exerciseCount: number;
+  kudosCount: number;
+  hasKudosGiven: boolean;
+  commentCount?: number;
+  relativeTime?: string;
+  workoutId?: string;
+  routineClone?: Workout;
+}
+
+export interface CatalogRoutineExercise {
+  name: string;
+  sets: number;
+  reps: string;
+  rest: string;
+  targetMuscle: string;
+  notes?: string;
+  intensityTechnique?: string;
+}
+
+export interface CatalogRoutineDay {
+  dayNumber: number;
+  dayTitle: string;
+  focus: string;
+  exercises: CatalogRoutineExercise[];
+}
+
+export interface CatalogRoutinePlan {
+  id: string;
+  title: string;
+  shortTitle: string;
+  author: string;
+  daysPerWeek: number;
+  daysBadge: string;
+  goal: string;
+  goalBadge: string;
+  level: DifficultyLevel | string;
+  equipment: string;
+  duration: string;
+  splitType: string;
+  description: string;
+  coverImage: string;
+  tags: string[];
+  days: CatalogRoutineDay[];
+}

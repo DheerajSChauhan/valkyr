@@ -33,20 +33,18 @@ export const BottomNav: React.FC = () => {
               key={item.id}
               type="button"
               onClick={() => setCurrentScreen(item.id)}
-              className={`relative flex flex-col items-center justify-center py-1 px-2.5 rounded-full transition-all duration-200 ${
-                isActive
+              className={`relative flex flex-col items-center justify-center py-1 px-2.5 rounded-full transition-all duration-200 ${isActive
                   ? 'text-[#C7FF3D]'
                   : 'text-[#929895] hover:text-white active:scale-95'
-              }`}
+                }`}
             >
               {isActive && (
                 <div className="absolute inset-0 bg-[#C7FF3D]/12 border border-[#C7FF3D]/30 rounded-full shadow-sm -z-10" />
               )}
               <Icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${isActive ? 'scale-110' : ''}`} />
               <span
-                className={`text-[9px] sm:text-[10px] mt-0.5 tracking-tight font-bold ${
-                  isActive ? 'text-[#C7FF3D]' : 'text-[#929895]'
-                }`}
+                className={`text-[9px] sm:text-[10px] mt-0.5 tracking-tight font-bold ${isActive ? 'text-[#C7FF3D]' : 'text-[#929895]'
+                  }`}
               >
                 {item.label}
               </span>
