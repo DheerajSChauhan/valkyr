@@ -454,6 +454,7 @@ export const HevyRoutineBuilderModal: React.FC<HevyRoutineBuilderModalProps> = (
                         exercise={re.exercise}
                         className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0"
                         showBadge={false}
+                        showGif={false}
                       />
                       <div className="min-w-0">
                         <h4 className="text-xs font-black text-white truncate">

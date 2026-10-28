@@ -264,7 +264,8 @@ export const WorkoutsScreen: React.FC = () => {
     startWorkout: contextStartWorkout,
     showToast,
     getExerciseBestStats,
-    startEmptyWorkout
+    startEmptyWorkout,
+    setSelectedExerciseDetail
   } = useFitness();
 
   // Routine vault state is component-local so it follows the Rules of Hooks.
@@ -1256,6 +1257,7 @@ export const WorkoutsScreen: React.FC = () => {
             }}
             DIRECTORY_MUSCLE_GROUPS={DIRECTORY_MUSCLE_GROUPS}
             DIRECTORY_EQUIPMENT={DIRECTORY_EQUIPMENT}
+            onOpenExerciseDetail={setSelectedExerciseDetail}
           />
         </div>
       )}

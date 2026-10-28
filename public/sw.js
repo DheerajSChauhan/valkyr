@@ -1,4 +1,4 @@
-const CACHE_NAME = 'valkyr-shell-v1';
+const CACHE_NAME = 'valkyr-shell-v2';
 const APP_SHELL = ['/', '/manifest.json', '/icons/icon.svg'];
 
 self.addEventListener('install', event => {

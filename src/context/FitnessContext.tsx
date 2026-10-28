@@ -42,6 +42,8 @@ interface FitnessContextType {
   setCurrentScreen: (screen: ScreenId) => void;
   selectedWorkoutDetail: Workout | null;
   setSelectedWorkoutDetail: (workout: Workout | null) => void;
+  selectedExerciseDetail: Exercise | null;
+  setSelectedExerciseDetail: (exercise: Exercise | null) => void;
 
   // Program Guidebook & PDF Preview Modal
   isGuidebookOpen: boolean;
@@ -278,6 +280,7 @@ function parseRepBounds(repRange: string): { minReps: number; maxReps: number } 
 export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
   const [selectedWorkoutDetail, setSelectedWorkoutDetail] = useState<Workout | null>(null);
+  const [selectedExerciseDetail, setSelectedExerciseDetail] = useState<Exercise | null>(null);
   const [isGuidebookOpen, setIsGuidebookOpen] = useState<boolean>(false);
   const [guidebookTab, setGuidebookTab] = useState<'guidelines' | 'warmup' | 'blueprint'>(
     'guidelines'
@@ -2042,6 +2045,8 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setCurrentScreen,
         selectedWorkoutDetail,
         setSelectedWorkoutDetail,
+        selectedExerciseDetail,
+        setSelectedExerciseDetail,
         isGuidebookOpen,
         guidebookTab,
         openGuidebook,

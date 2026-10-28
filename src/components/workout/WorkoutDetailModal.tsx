@@ -26,7 +26,8 @@ export const WorkoutDetailModal: React.FC = () => {
     programWeek,
     openGuidebook,
     swapWorkoutExerciseInPlan,
-    exercises
+    exercises,
+    setSelectedExerciseDetail
   } = useFitness();
 
   const [activeVideoExId, setActiveVideoExId] = useState<string | null>(null);
@@ -239,32 +240,19 @@ export const WorkoutDetailModal: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Action Buttons: YouTube Autoplay & Alternates */}
+                      {/* Action Buttons: Exercise Demo & Alternates */}
                       <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1.5 shrink-0">
                         {ex.videoId && (
                           <button
                             type="button"
                             onClick={() => {
-                              setPreviewSubVideo(null);
-                              setActiveVideoExId(isVideoOpen ? null : ex.id);
+                              setSelectedExerciseDetail(ex);
                             }}
-                            className={`px-2.5 py-1.5 rounded-xl text-[11px] font-black transition flex items-center gap-1 ${
-                              isVideoOpen
-                                ? 'bg-[#C7FF3D] text-[#101112]'
-                                : 'btn-glass-subtle text-[#C7FF3D] border-[#C7FF3D]/30 hover:border-[#C7FF3D]'
-                            }`}
+                            className="btn-glass-subtle px-2.5 py-1.5 rounded-xl text-[11px] font-black text-[#C7FF3D] border-[#C7FF3D]/30 hover:border-[#C7FF3D] transition flex items-center gap-1"
+                            title="Choose GIF or YouTube demo"
                           >
-                            {isVideoOpen ? (
-                              <>
-                                <Film className="w-3 h-3" />
-                                <span>GIF</span>
-                              </>
-                            ) : (
-                              <>
-                                <Play className="w-3 h-3 fill-[#C7FF3D]" />
-                                <span>YouTube</span>
-                              </>
-                            )}
+                            <Play className="w-3 h-3 fill-[#C7FF3D]" />
+                            <span>View Demo</span>
                           </button>
                         )}
 
@@ -313,7 +301,21 @@ export const WorkoutDetailModal: React.FC = () => {
                           <button
                             key={sub.name}
                             type="button"
-                            onClick={() => setExpandedAltExId(ex.id)}
+                            onClick={event => {
+                              event.stopPropagation();
+                              const libraryMatch = exercises.find(
+                                candidate => candidate.name.toLowerCase() === sub.name.toLowerCase()
+                              );
+                              setSelectedExerciseDetail(libraryMatch || {
+                                ...ex,
+                                id: `${ex.id}-sub-${sIdx + 1}`,
+                                name: sub.name,
+                                equipment: sub.equipment,
+                                videoId: sub.videoId,
+                                mediaUrl: sub.mediaUrl,
+                                notes: sub.notes || ex.notes
+                              });
+                            }}
                             className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-[#65D9C0]/10 text-[#65D9C0] border border-[#65D9C0]/25 hover:bg-[#65D9C0]/20 transition"
                           >
                             Opt {sIdx + 1}: {sub.name}

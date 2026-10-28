@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { warmupData } from '../../data/warmupData';
 import { Unit } from '../../types';
 import { Flame, X, Calculator, Play } from 'lucide-react';
+import { buildYouTubeEmbedUrl } from '../../lib/media';
 
 interface WarmupCalculatorModalProps {
   isOpen: boolean;
@@ -186,7 +187,12 @@ export const WarmupCalculatorModal: React.FC<WarmupCalculatorModalProps> = ({
               <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-white/15">
                 <iframe
                   className="w-full h-full"
-                  src={`https://www.youtube-nocookie.com/embed/${activeDrillVideo.id}?start=${activeDrillVideo.start}&autoplay=1&mute=1&playsinline=1&rel=0`}
+                  src={buildYouTubeEmbedUrl(activeDrillVideo.id, {
+                    start: activeDrillVideo.start,
+                    autoplay: true,
+                    muted: true,
+                    loop: false
+                  }) || undefined}
                   title={activeDrillVideo.name}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

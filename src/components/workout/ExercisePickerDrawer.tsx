@@ -5,6 +5,7 @@ import { GlassCard } from '../common/GlassCard';
 import { CustomExerciseModal } from './CustomExerciseModal';
 import { Search, X, Plus, Play, Dumbbell } from 'lucide-react';
 import { ExerciseMedia } from './ExerciseMedia';
+import { openYouTube } from '../../lib/media';
 
 const MUSCLE_GROUPS: string[] = [
   'All',
@@ -164,6 +165,7 @@ export const ExercisePickerDrawer: React.FC<ExercisePickerDrawerProps> = ({
                   <ExerciseMedia
                     exercise={ex}
                     className="w-12 h-12 rounded-xl object-cover border border-white/[0.08] shrink-0"
+                    showGif={false}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
@@ -173,7 +175,7 @@ export const ExercisePickerDrawer: React.FC<ExercisePickerDrawerProps> = ({
                           type="button"
                           onClick={e => {
                             e.stopPropagation();
-                            window.open(`https://www.youtube.com/watch?v=${ex.videoId}`, '_blank');
+                            openYouTube(ex.videoId || '');
                           }}
                           className="text-[#C7FF3D] hover:text-[#C7FF3D]/80 p-1"
                           title="Video demo"

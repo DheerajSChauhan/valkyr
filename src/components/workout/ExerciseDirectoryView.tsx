@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Exercise, Equipment } from '../../types';
 import { GlassCard } from '../common/GlassCard';
-import { Search, Play, Dumbbell, Film, Repeat } from 'lucide-react';
-import { ExerciseMedia, ExerciseAutoplayEmbed } from './ExerciseMedia';
+import { Search, Play, Dumbbell, Repeat } from 'lucide-react';
+import { ExerciseMedia } from './ExerciseMedia';
 
 interface ExerciseDirectoryViewProps {
   filteredExercises: Exercise[];
@@ -25,6 +25,7 @@ interface ExerciseDirectoryViewProps {
   onResetDirectoryFilters: () => void;
   DIRECTORY_MUSCLE_GROUPS: string[];
   DIRECTORY_EQUIPMENT: (string | Equipment)[];
+  onOpenExerciseDetail: (exercise: Exercise) => void;
 }
 
 export const ExerciseDirectoryView: React.FC<ExerciseDirectoryViewProps> = ({
@@ -39,10 +40,9 @@ export const ExerciseDirectoryView: React.FC<ExerciseDirectoryViewProps> = ({
   onDirectoryEquipmentChange,
   onResetDirectoryFilters,
   DIRECTORY_MUSCLE_GROUPS,
-  DIRECTORY_EQUIPMENT
+  DIRECTORY_EQUIPMENT,
+  onOpenExerciseDetail
 }) => {
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-
   return (
     <div className="space-y-4">
       <div className="relative">
@@ -110,7 +110,6 @@ export const ExerciseDirectoryView: React.FC<ExerciseDirectoryViewProps> = ({
         <div className="space-y-3">
           {filteredExercises.slice(0, 60).map(ex => {
             const stats = getExerciseBestStats(ex.id);
-            const isVideoOpen = activeVideoId === ex.id;
             return (
               <GlassCard key={ex.id} variant="standard" className="p-3.5 sm:p-4 space-y-3">
                 <div className="flex items-start justify-between gap-3">
@@ -118,6 +117,7 @@ export const ExerciseDirectoryView: React.FC<ExerciseDirectoryViewProps> = ({
                     <ExerciseMedia
                       exercise={ex}
                       className="w-20 h-20 rounded-xl object-cover border border-white/[0.08] shrink-0"
+                      showGif={false}
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-black text-white">{ex.name}</h3>
@@ -142,52 +142,43 @@ export const ExerciseDirectoryView: React.FC<ExerciseDirectoryViewProps> = ({
                             <Repeat className="w-3 h-3" /> Alternates:
                           </span>
                           {ex.substitutions.map(sub => (
-                            <span
+                            <button
                               key={sub.name}
+                              type="button"
+                              onClick={event => {
+                                event.stopPropagation();
+                                onOpenExerciseDetail({
+                                  ...ex,
+                                  id: `${ex.id}-sub-${sub.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+                                  name: sub.name,
+                                  equipment: sub.equipment,
+                                  videoId: sub.videoId,
+                                  mediaUrl: sub.mediaUrl,
+                                  notes: sub.notes || ex.notes
+                                });
+                              }}
                               className="text-[10px] px-2 py-0.2 rounded-md bg-[#65D9C0]/10 text-[#65D9C0] border border-[#65D9C0]/25"
                             >
                               {sub.name}
-                            </span>
+                            </button>
                           ))}
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {ex.videoId && (
+                  {(ex.videoId || ex.mediaUrl) && (
                     <button
                       type="button"
-                      onClick={() => setActiveVideoId(isVideoOpen ? null : ex.id)}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 shrink-0 ${
-                        isVideoOpen
-                          ? 'bg-[#C7FF3D] text-[#101112]'
-                          : 'btn-glass-subtle text-[#C7FF3D] border-[#C7FF3D]/30 hover:border-[#C7FF3D]'
-                      }`}
-                      title="Toggle Autoplay YouTube Demo"
+                      onClick={() => onOpenExerciseDetail(ex)}
+                      className="btn-glass-subtle px-2.5 py-1.5 rounded-xl text-xs font-black text-[#C7FF3D] border-[#C7FF3D]/30 hover:border-[#C7FF3D] transition flex items-center gap-1 shrink-0"
+                      title="View exercise GIF or YouTube demo"
                     >
-                      {isVideoOpen ? (
-                        <>
-                          <Film className="w-3.5 h-3.5" />
-                          <span>GIF View</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3.5 h-3.5 fill-[#C7FF3D]" />
-                          <span>YouTube</span>
-                        </>
-                      )}
+                      <Play className="w-3.5 h-3.5 fill-[#C7FF3D]" />
+                      <span>View Demo</span>
                     </button>
                   )}
                 </div>
-
-                {isVideoOpen && ex.videoId && (
-                  <ExerciseAutoplayEmbed
-                    videoId={ex.videoId}
-                    videoStart={ex.videoStart}
-                    title={ex.name}
-                    onSwitchToGif={() => setActiveVideoId(null)}
-                  />
-                )}
 
                 <div className="p-2.5 rounded-xl bg-[#151718] border border-white/[0.06]">
                   {stats ? (

@@ -3,6 +3,7 @@ import { useFitness } from '../../context/FitnessContext';
 import { Exercise, Equipment } from '../../types';
 import { GlassCard } from '../common/GlassCard';
 import { X, Play, Film } from 'lucide-react';
+import { openYouTube, parseYouTubeMedia } from '../../lib/media';
 
 const TARGET_MUSCLE_OPTIONS: string[] = [
   'Upper Chest',
@@ -43,13 +44,7 @@ const EQUIPMENT_OPTIONS_IN_MODAL: Equipment[] = [
 ];
 
 const extractYouTubeId = (input: string): string | null => {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-  if (/^[\w-]{11}$/.test(trimmed)) return trimmed;
-  const match = trimmed.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/|live\/)|youtu\.be\/)([\w-]{11})/
-  );
-  return match ? match[1] : null;
+  return parseYouTubeMedia(input)?.id || null;
 };
 
 interface CustomExerciseModalProps {
@@ -333,9 +328,10 @@ export const CustomExerciseModal: React.FC<CustomExerciseModalProps> = ({
             {resolvedVideoId && (
               <button
                 type="button"
-                onClick={() =>
-                  window.open(`https://www.youtube.com/watch?v=${resolvedVideoId}`, '_blank')
-                }
+                onClick={event => {
+                  event.stopPropagation();
+                  openYouTube(resolvedVideoId);
+                }}
                 className="w-full py-2 rounded-xl border border-[#C7FF3D]/30 text-xs font-bold text-[#C7FF3D] flex items-center justify-center gap-1.5 hover:bg-[#C7FF3D]/10 transition"
               >
                 <Play className="w-3.5 h-3.5" />

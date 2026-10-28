@@ -1,13 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Film, Volume2, VolumeX, ExternalLink } from 'lucide-react';
+import { Film, Volume2, VolumeX, ExternalLink } from 'lucide-react';
 import { Exercise } from '../../types';
-import { resolveGifUrlForExercise } from '../../data/exerciseGymGifs';
+import { resolveGifUrlForExercise, resolveStaticThumbnailUrl } from '../../data/exerciseGymGifs';
+import { buildYouTubeEmbedUrl, buildYouTubeWatchUrl } from '../../lib/media';
 
 interface ExerciseMediaProps {
   exercise: Pick<Exercise, 'id' | 'name' | 'mediaUrl' | 'equipment' | 'targetMuscle'>;
   className?: string;
   showBadge?: boolean;
+  showGif?: boolean;
 }
+
+const StaticExerciseImage: React.FC<{
+  src?: string;
+  alt: string;
+  className: string;
+  onError: () => void;
+}> = ({ src, alt, className, onError }) => {
+  if (!src) {
+    return (
+      <div className={`flex items-center justify-center bg-[#151718] ${className}`} aria-label={alt}>
+        <span className="text-[9px] font-black uppercase tracking-widest text-[#747b78]">
+          Image unavailable
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      className={`block w-full h-full object-contain ${className}`}
+      onError={onError}
+    />
+  );
+};
 
 // High-craft animated SVG biomechanical fallback when offline or before remote GIF resolves
 const AnimatedBiomechanicalFallback: React.FC<{
@@ -88,7 +118,8 @@ const AnimatedBiomechanicalFallback: React.FC<{
 export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
   exercise,
   className = '',
-  showBadge = true
+  showBadge = true,
+  showGif = true
 }) => {
   const [hasError, setHasError] = useState(false);
 
@@ -105,10 +136,30 @@ export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
     resolvedCatalogGif ||
     exercise.mediaUrl ||
     `/exercises/${encodeURIComponent(exercise.id)}.gif`;
+  const staticThumbnailUrl = resolveStaticThumbnailUrl(candidateUrl);
 
   useEffect(() => {
     setHasError(false);
   }, [candidateUrl, exercise.name]);
+
+  if (!showGif) {
+    return (
+      <div className={`relative overflow-hidden bg-[#151718] border border-white/10 ${className}`}>
+        <StaticExerciseImage
+          src={staticThumbnailUrl}
+          alt={`${exercise.name} static exercise image`}
+          className="w-full h-full"
+          onError={() => setHasError(true)}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+        {showBadge && (
+          <span className="absolute bottom-1 right-1 text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-black/75 text-[#929895] border border-white/10">
+            Photo
+          </span>
+        )}
+      </div>
+    );
+  }
 
   if (hasError || !candidateUrl) {
     return (
@@ -122,12 +173,13 @@ export const ExerciseMedia: React.FC<ExerciseMediaProps> = ({
   }
 
   return (
-    <div className={`relative overflow-hidden bg-[#151718] ${className}`}>
+    <div className={`relative overflow-hidden flex items-center justify-center bg-[#151718] ${className}`}>
       <img
         src={candidateUrl}
         alt={`${exercise.name} GIF demonstration`}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         loading="lazy"
+        referrerPolicy="no-referrer"
         onError={() => setHasError(true)}
       />
       {showBadge && (
@@ -154,9 +206,21 @@ export const ExerciseAutoplayEmbed: React.FC<ExerciseAutoplayPlayerProps> = ({
 }) => {
   const [isMuted, setIsMuted] = useState(true);
 
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?start=${
-    videoStart || 0
-  }&autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${videoId}&playsinline=1&rel=0&modestbranding=1`;
+  const embedUrl = buildYouTubeEmbedUrl(videoId, {
+    start: videoStart,
+    autoplay: true,
+    muted: isMuted,
+    loop: true
+  });
+  const watchUrl = buildYouTubeWatchUrl(videoId, videoStart);
+
+  if (!embedUrl) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-[#151718] p-4 text-xs text-[#929895]">
+        This video demo is unavailable.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2 animate-in fade-in duration-200">
@@ -187,9 +251,10 @@ export const ExerciseAutoplayEmbed: React.FC<ExerciseAutoplayPlayerProps> = ({
             )}
           </button>
           <a
-            href={`https://www.youtube.com/watch?v=${videoId}${videoStart ? `&t=${videoStart}s` : ''}`}
+            href={watchUrl || '#'}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={event => event.stopPropagation()}
             className="btn-glass-subtle px-2 py-1 rounded-lg text-[10px] font-bold text-[#929895] hover:text-white flex items-center gap-1"
             title="Open on YouTube"
           >

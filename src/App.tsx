@@ -13,6 +13,7 @@ import { ProfileScreen } from './screens/ProfileScreen';
 import { NutritionRecoveryScreen } from './screens/NutritionRecoveryScreen';
 import { ActiveWorkoutModal } from './components/workout/ActiveWorkoutModal';
 import { WorkoutDetailModal } from './components/workout/WorkoutDetailModal';
+import { ExerciseDetailModal } from './components/workout/ExerciseDetailModal';
 import { WorkoutSummaryModal } from './components/workout/WorkoutSummaryModal';
 import { ProgramGuidebookModal } from './components/workout/ProgramGuidebookModal';
 import { RestTimerCapsule } from './components/common/RestTimerCapsule';
@@ -69,6 +70,7 @@ const MainLayout: React.FC = () => {
 
       <ActiveWorkoutModal />
       <WorkoutDetailModal />
+      <ExerciseDetailModal />
       <WorkoutSummaryModal />
       <ProgramGuidebookModal
         isOpen={isGuidebookOpen}

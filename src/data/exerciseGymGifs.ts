@@ -176,6 +176,12 @@ export function getCachedGifRecords(): ExerciseGymGifRecord[] {
   return cachedGifRecords;
 }
 
+export function resolveStaticThumbnailUrl(gifUrl?: string): string | undefined {
+  if (!gifUrl) return undefined;
+  const match = gifUrl.match(/@v[^/]+\/(.+)\.gif(?:\?.*)?$/);
+  return match ? `/exercises/thumbnails/${match[1]}.webp` : undefined;
+}
+
 function labelForMuscle(muscle: string): string {
   return (
     MUSCLE_LABELS[muscle] ||
