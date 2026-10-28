@@ -1,0 +1,579 @@
+[
+  {
+    "id": "sanitized-routine-1",
+    "slug": "4-day-power-hypertrophy-upper-lower-split",
+    "title": "4-Day Power Hypertrophy Upper/Lower Split",
+    "shortTitle": "4-Day Upper/Lower",
+    "author": "Valkyr Sports Science",
+    "daysPerWeek": 4,
+    "daysBadge": "4 Days / Week",
+    "goal": "Hypertrophy & Power",
+    "goalBadge": "Hypertrophy",
+    "level": "Intermediate",
+    "equipment": "Full Gym",
+    "duration": "50–65 mins",
+    "splitType": "Upper / Lower",
+    "description": "A structured 4-day training split applying double progression and periodized volume for targeted hypertrophy and progressive overload.",
+    "coverImage": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "4-Day",
+      "Upper / Lower",
+      "Hypertrophy",
+      "Strength"
+    ],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Chest & Upper Chest Focus",
+        "focus": "Chest, Upper Chest, Back, Lats, Shoulders, Biceps, Triceps overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": 4,
+            "reps": "3-5 reps",
+            "rest": "150s",
+            "targetMuscle": "Chest",
+            "notes": "Standard biomechanical execution for chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Incline Dumbbell Bench Press",
+            "sets": 3,
+            "reps": "6-10 reps",
+            "rest": "90s",
+            "targetMuscle": "Upper Chest",
+            "notes": "Standard biomechanical execution for upper chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Barbell Bent Over Row",
+            "sets": 4,
+            "reps": "3-5 reps",
+            "rest": "120s",
+            "targetMuscle": "Back",
+            "notes": "Standard biomechanical execution for back. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Lat Pulldown",
+            "sets": 3,
+            "reps": "6-10 reps",
+            "rest": "90s",
+            "targetMuscle": "Lats",
+            "notes": "Standard biomechanical execution for lats. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Standing Overhead Barbell Press",
+            "sets": 3,
+            "reps": "5-8 reps",
+            "rest": "120s",
+            "targetMuscle": "Shoulders",
+            "notes": "Standard biomechanical execution for shoulders. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Barbell Biceps Curl",
+            "sets": 3,
+            "reps": "6-10 reps",
+            "rest": "75s",
+            "targetMuscle": "Biceps",
+            "notes": "Standard biomechanical execution for biceps. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "EZ-Bar Skull Crusher",
+            "sets": 3,
+            "reps": "6-10 reps",
+            "rest": "75s",
+            "targetMuscle": "Triceps",
+            "notes": "Standard biomechanical execution for triceps. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Quads & Hamstrings Focus",
+        "focus": "Quads, Hamstrings, Calves overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Back Squat",
+            "sets": 4,
+            "reps": "3-5 reps",
+            "rest": "180s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Barbell Conventional Deadlift",
+            "sets": 3,
+            "reps": "3-5 reps",
+            "rest": "180s",
+            "targetMuscle": "Hamstrings",
+            "notes": "Standard biomechanical execution for hamstrings. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "45° Leg Press",
+            "sets": 3,
+            "reps": "10-15 reps",
+            "rest": "90s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Lying Hamstring Leg Curl",
+            "sets": 3,
+            "reps": "6-10 reps",
+            "rest": "60s",
+            "targetMuscle": "Hamstrings",
+            "notes": "Standard biomechanical execution for hamstrings. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Standing Calf Raise",
+            "sets": 4,
+            "reps": "6-10 reps",
+            "rest": "60s",
+            "targetMuscle": "Calves",
+            "notes": "Standard biomechanical execution for calves. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Upper Chest & Chest Focus",
+        "focus": "Upper Chest, Chest, Back, Lats, Lateral Delts, Biceps, Triceps overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Incline Barbell Bench Press",
+            "sets": 4,
+            "reps": "8-12 reps",
+            "rest": "90s",
+            "targetMuscle": "Upper Chest",
+            "notes": "Standard biomechanical execution for upper chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Flat Dumbbell Flye",
+            "sets": 3,
+            "reps": "10-12 reps",
+            "rest": "60s",
+            "targetMuscle": "Chest",
+            "notes": "Standard biomechanical execution for chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Seated Cable Row",
+            "sets": 4,
+            "reps": "8-12 reps",
+            "rest": "75s",
+            "targetMuscle": "Back",
+            "notes": "Standard biomechanical execution for back. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "One-Arm Dumbbell Row",
+            "sets": 3,
+            "reps": "8-12 reps",
+            "rest": "75s",
+            "targetMuscle": "Lats",
+            "notes": "Standard biomechanical execution for lats. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Dumbbell Lateral Raise",
+            "sets": 4,
+            "reps": "12-15 reps",
+            "rest": "60s",
+            "targetMuscle": "Lateral Delts",
+            "notes": "Standard biomechanical execution for lateral delts. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Incline Dumbbell Biceps Curl",
+            "sets": 3,
+            "reps": "10-12 reps",
+            "rest": "60s",
+            "targetMuscle": "Biceps",
+            "notes": "Standard biomechanical execution for biceps. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Cable Triceps Pushdown",
+            "sets": 3,
+            "reps": "10-12 reps",
+            "rest": "60s",
+            "targetMuscle": "Triceps",
+            "notes": "Standard biomechanical execution for triceps. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "dayTitle": "Day 4: Quads & Hamstrings Focus",
+        "focus": "Quads, Hamstrings, Glutes, Calves overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Front Squat",
+            "sets": 4,
+            "reps": "8-12 reps",
+            "rest": "120s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Barbell Romanian Deadlift",
+            "sets": 3,
+            "reps": "8-12 reps",
+            "rest": "90s",
+            "targetMuscle": "Hamstrings",
+            "notes": "Standard biomechanical execution for hamstrings. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Dumbbell Walking Lunges",
+            "sets": 3,
+            "reps": "10-12 reps",
+            "rest": "75s",
+            "targetMuscle": "Glutes",
+            "notes": "Standard biomechanical execution for glutes. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Leg Extension",
+            "sets": 4,
+            "reps": "12-15 reps",
+            "rest": "60s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Seated Calf Raise",
+            "sets": 4,
+            "reps": "12-15 reps",
+            "rest": "60s",
+            "targetMuscle": "Calves",
+            "notes": "Standard biomechanical execution for calves. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sanitized-routine-2",
+    "slug": "classic-6-day-push-pull-legs-ppl-split",
+    "title": "Classic 6-Day Push Pull Legs (PPL) Split",
+    "shortTitle": "Classic 6-Day PPL",
+    "author": "Valkyr Sports Science",
+    "daysPerWeek": 6,
+    "daysBadge": "6 Days / Week",
+    "goal": "Hypertrophy & Power",
+    "goalBadge": "Hypertrophy",
+    "level": "Advanced",
+    "equipment": "Full Gym",
+    "duration": "50–65 mins",
+    "splitType": "Push Pull Legs (PPL)",
+    "description": "A structured 6-day training split applying double progression and periodized volume for targeted hypertrophy and progressive overload.",
+    "coverImage": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "6-Day",
+      "Push Pull Legs (PPL)",
+      "Hypertrophy",
+      "Strength"
+    ],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Chest & Shoulders Focus",
+        "focus": "Chest, Shoulders, Upper Chest, Lateral Delts, Triceps overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": 4,
+            "reps": "5 reps",
+            "rest": "150s",
+            "targetMuscle": "Chest",
+            "notes": "Standard biomechanical execution for chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Standing Overhead Barbell Press",
+            "sets": 3,
+            "reps": "8-10 reps",
+            "rest": "120s",
+            "targetMuscle": "Shoulders",
+            "notes": "Standard biomechanical execution for shoulders. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Incline Dumbbell Bench Press",
+            "sets": 3,
+            "reps": "10-12 reps",
+            "rest": "90s",
+            "targetMuscle": "Upper Chest",
+            "notes": "Standard biomechanical execution for upper chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Cable Lateral Raise",
+            "sets": 4,
+            "reps": "12-15 reps",
+            "rest": "60s",
+            "targetMuscle": "Lateral Delts",
+            "notes": "Standard biomechanical execution for lateral delts. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Cable Triceps Pushdown",
+            "sets": 3,
+            "reps": "12-15 reps",
+            "rest": "60s",
+            "targetMuscle": "Triceps",
+            "notes": "Standard biomechanical execution for triceps. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Hamstrings & Upper Back Focus",
+        "focus": "Hamstrings, Upper Back, Lats, Rear Delts, Biceps overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Conventional Deadlift",
+            "sets": 3,
+            "reps": "5 reps",
+            "rest": "180s",
+            "targetMuscle": "Hamstrings",
+            "notes": "Standard biomechanical execution for hamstrings. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Chest-Supported T-Bar Row",
+            "sets": 4,
+            "reps": "8-10 reps",
+            "rest": "90s",
+            "targetMuscle": "Upper Back",
+            "notes": "Standard biomechanical execution for upper back. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Lat Pulldown",
+            "sets": 3,
+            "reps": "10-12 reps",
+            "rest": "90s",
+            "targetMuscle": "Lats",
+            "notes": "Standard biomechanical execution for lats. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Cable Face Pull",
+            "sets": 4,
+            "reps": "15-20 reps",
+            "rest": "60s",
+            "targetMuscle": "Rear Delts",
+            "notes": "Standard biomechanical execution for rear delts. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Incline Dumbbell Biceps Curl",
+            "sets": 4,
+            "reps": "10-12 reps",
+            "rest": "60s",
+            "targetMuscle": "Biceps",
+            "notes": "Standard biomechanical execution for biceps. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Compound & Hamstrings Focus",
+        "focus": "Compound, Hamstrings, Quads, Calves overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Back Squats",
+            "sets": 4,
+            "reps": "6 reps",
+            "rest": "90s",
+            "targetMuscle": "Compound",
+            "notes": "Control eccentric tempo and execute with full range of motion."
+          },
+          {
+            "name": "Barbell Romanian Deadlift",
+            "sets": 3,
+            "reps": "8-10 reps",
+            "rest": "90s",
+            "targetMuscle": "Hamstrings",
+            "notes": "Standard biomechanical execution for hamstrings. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "45° Leg Press",
+            "sets": 3,
+            "reps": "12-15 reps",
+            "rest": "90s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Lying Hamstring Leg Curl",
+            "sets": 3,
+            "reps": "12-15 reps",
+            "rest": "60s",
+            "targetMuscle": "Hamstrings",
+            "notes": "Standard biomechanical execution for hamstrings. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Standing Calf Raise",
+            "sets": 4,
+            "reps": "15 reps",
+            "rest": "60s",
+            "targetMuscle": "Calves",
+            "notes": "Standard biomechanical execution for calves. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sanitized-routine-3",
+    "slug": "3-day-linear-compound-strength-progression",
+    "title": "3-Day Linear Compound Strength Progression",
+    "shortTitle": "3-Day Strength Wave",
+    "author": "Valkyr Sports Science",
+    "daysPerWeek": 3,
+    "daysBadge": "3 Days / Week",
+    "goal": "Raw Strength",
+    "goalBadge": "Strength Focus",
+    "level": "Beginner",
+    "equipment": "Full Gym",
+    "duration": "50–65 mins",
+    "splitType": "Strength",
+    "description": "A structured 3-day training split applying double progression and periodized volume for targeted hypertrophy and progressive overload.",
+    "coverImage": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "3-Day",
+      "Strength",
+      "Hypertrophy",
+      "Strength"
+    ],
+    "days": [
+      {
+        "dayNumber": 1,
+        "dayTitle": "Day 1: Quads & Chest Focus",
+        "focus": "Quads, Chest, Back, Triceps, Core overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Back Squat",
+            "sets": 3,
+            "reps": "5/3/1+ reps",
+            "rest": "180s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Barbell Bench Press",
+            "sets": 3,
+            "reps": "5/3/1+ reps",
+            "rest": "150s",
+            "targetMuscle": "Chest",
+            "notes": "Standard biomechanical execution for chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "One-Arm Dumbbell Row",
+            "sets": 5,
+            "reps": "10 reps",
+            "rest": "75s",
+            "targetMuscle": "Back",
+            "notes": "Standard biomechanical execution for back. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Triceps Dips",
+            "sets": 5,
+            "reps": "10 reps",
+            "rest": "60s",
+            "targetMuscle": "Triceps",
+            "notes": "Standard biomechanical execution for triceps. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Hanging Knee Raise",
+            "sets": 4,
+            "reps": "12-15 reps",
+            "rest": "60s",
+            "targetMuscle": "Core",
+            "notes": "Standard biomechanical execution for core. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "dayTitle": "Day 2: Hamstrings & Shoulders Focus",
+        "focus": "Hamstrings, Shoulders, Lats, Upper Chest, Quads overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Conventional Deadlift",
+            "sets": 3,
+            "reps": "5/3/1+ reps",
+            "rest": "180s",
+            "targetMuscle": "Hamstrings",
+            "notes": "Standard biomechanical execution for hamstrings. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Standing Overhead Barbell Press",
+            "sets": 3,
+            "reps": "5/3/1+ reps",
+            "rest": "120s",
+            "targetMuscle": "Shoulders",
+            "notes": "Standard biomechanical execution for shoulders. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Lat Pulldown",
+            "sets": 5,
+            "reps": "10 reps",
+            "rest": "90s",
+            "targetMuscle": "Lats",
+            "notes": "Standard biomechanical execution for lats. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Incline Dumbbell Bench Press",
+            "sets": 4,
+            "reps": "12 reps",
+            "rest": "90s",
+            "targetMuscle": "Upper Chest",
+            "notes": "Standard biomechanical execution for upper chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Bulgarian Split Squat",
+            "sets": 3,
+            "reps": "10 reps",
+            "rest": "75s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "dayTitle": "Day 3: Chest & Quads Focus",
+        "focus": "Chest, Quads, Back, Triceps, Core overload and mechanical tension",
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": 5,
+            "reps": "5 reps",
+            "rest": "150s",
+            "targetMuscle": "Chest",
+            "notes": "Standard biomechanical execution for chest. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Barbell Back Squat",
+            "sets": 5,
+            "reps": "5 reps",
+            "rest": "180s",
+            "targetMuscle": "Quads",
+            "notes": "Standard biomechanical execution for quads. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Chest-Supported Machine Row",
+            "sets": 4,
+            "reps": "12 reps",
+            "rest": "75s",
+            "targetMuscle": "Back",
+            "notes": "Standard biomechanical execution for back. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Cable Triceps Pushdown",
+            "sets": 4,
+            "reps": "15 reps",
+            "rest": "60s",
+            "targetMuscle": "Triceps",
+            "notes": "Standard biomechanical execution for triceps. Maintain controlled 2s eccentric phase."
+          },
+          {
+            "name": "Cable Abdominal Crunch",
+            "sets": 4,
+            "reps": "15 reps",
+            "rest": "60s",
+            "targetMuscle": "Core",
+            "notes": "Standard biomechanical execution for core. Maintain controlled 2s eccentric phase."
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -11,7 +11,8 @@ import {
   ChevronRight,
   Flame,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 
 interface ActiveProgramHubProps {
@@ -34,32 +35,91 @@ export const ActiveProgramHub: React.FC<ActiveProgramHubProps> = ({ onStartWorko
     workouts,
     startWorkout,
     setSelectedWorkoutDetail,
-    openGuidebook
+    openGuidebook,
+    programPlans,
+    startProgramPlan,
+    setCurrentScreen
   } = useFitness();
 
   const weekScrollRef = useRef<HTMLDivElement>(null);
 
-  const isRamping = programWeek >= 6;
-  const phasePrefix = isRamping ? 'ramping-' : 'foundation-';
+  if (!activeProgram.isStarted || !activeProgram.programId) {
+    const suggestedProgram = programPlans[0];
 
-  const MICROCYCLE_DAYS: MicrocycleDay[] = [
-    { slot: 1, code: 'D1', name: 'Upper', workoutId: `${phasePrefix}d1` },
-    { slot: 2, code: 'D2', name: 'Lower', workoutId: `${phasePrefix}d2` },
-    { slot: 3, code: 'D3', name: 'Pull', workoutId: `${phasePrefix}d3` },
-    { slot: 4, code: 'D4', name: 'Push', workoutId: `${phasePrefix}d4` },
-    { slot: 5, code: 'D5', name: 'Legs', workoutId: `${phasePrefix}d5` }
-  ];
+    return (
+      <section
+        aria-label="Choose a training program"
+        className="rounded-2xl sm:rounded-3xl bg-[#181A1B]/95 border border-white/10 p-4 sm:p-5 shadow-2xl relative overflow-hidden space-y-4"
+      >
+        <div className="absolute -top-16 -right-16 w-52 h-52 bg-[#C7FF3D]/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="space-y-1 relative">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#C7FF3D] shrink-0" />
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#C7FF3D]">
+              No active program
+            </span>
+          </div>
+          <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
+            Choose your next training plan
+          </h2>
+          <p className="text-[11px] text-[#929895] font-medium max-w-lg">
+            Follow a structured program to get a personalized workout queue, progression tracking, and weekly guidance.
+          </p>
+        </div>
 
-  // Resolve currently selected or queued workout (defaults to D2 Lower as requested in prompt)
-  const currentSlot = activeProgram.currentDaySlot || 2;
+        {suggestedProgram && (
+          <div className="rounded-2xl bg-gradient-to-br from-[#202523] via-[#1A1D1E] to-[#141617] border border-[#C7FF3D]/30 p-4 space-y-3 relative">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#C7FF3D]">
+                Suggested for you
+              </span>
+              <h3 className="text-base sm:text-lg font-black text-white mt-1">
+                {suggestedProgram.title}
+              </h3>
+              <p className="text-[11px] text-[#929895] mt-1">
+                {suggestedProgram.daysPerWeek} days/week • {suggestedProgram.totalWeeks} weeks • {suggestedProgram.level}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCurrentScreen('workouts')}
+              className="w-full py-3 px-4 rounded-xl bg-[#C7FF3D] hover:bg-[#d5ff5e] text-[#101112] font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#C7FF3D]/30 transition-all"
+            >
+              <span>BROWSE WORKOUT LIBRARY</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  const activePlan = programPlans.find(plan => plan.id === activeProgram.programId);
+  const activeBlock =
+    activePlan?.blocks.find(block => programWeek >= block.weekStart && programWeek <= block.weekEnd) ||
+    activePlan?.blocks[0];
+  const programDays = activeBlock
+    ? Object.entries(activeBlock.scheduleMap)
+        .filter((entry): entry is [string, string] => Boolean(entry[1]))
+        .map(([dayId, workoutId], index) => {
+          const workout = workouts.find(item => item.id === workoutId);
+          const title = workout?.title || `Day ${index + 1}`;
+          return {
+            slot: index + 1,
+            code: `D${index + 1}`,
+            name: title.split(':')[1]?.trim() || title,
+            workoutId
+          };
+        })
+    : [];
+  const maxProgramWeeks = activePlan?.totalWeeks || 12;
+
+  const currentSlot = activeProgram.currentDaySlot || 1;
   const selectedDayInfo =
-    MICROCYCLE_DAYS.find(d => d.slot === currentSlot) || MICROCYCLE_DAYS[1];
+    programDays.find(d => d.slot === currentSlot) || programDays[0];
 
   const queuedWorkout =
-    workouts.find(w => w.id === selectedDayInfo.workoutId) ||
-    workouts.find(w => w.id === 'foundation-d2') ||
-    workouts[1] ||
-    workouts[0];
+    workouts.find(w => w.id === selectedDayInfo?.workoutId) || workouts[0];
 
   const handleStartWorkout = () => {
     if (onStartWorkout) {
@@ -93,18 +153,14 @@ export const ActiveProgramHub: React.FC<ActiveProgramHubProps> = ({ onStartWorko
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="w-2 h-2 rounded-full bg-[#C7FF3D] animate-pulse shrink-0" />
             <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#C7FF3D] truncate">
-              ACTIVE PROGRAM • JEFF NIPPARD - Transformation System
+              ACTIVE PROGRAM • {activePlan?.title || 'Training Plan'}
             </span>
           </div>
           <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
-            {isRamping ? 'Ramping Hypertrophy Block' : 'Foundation Strength Block'}
+            {activeBlock?.name || 'Current Training Block'}
           </h2>
           <p className="text-[11px] text-[#929895] font-medium">
-            {programWeek === 1
-              ? 'Week 1 Deload & Technique Intro (RPE 6–9 • Leave 1–3 reps in tank)'
-              : programWeek <= 5
-              ? `Week ${programWeek}: Foundation Overload (Last Set RPE 10 Failure)`
-              : `Week ${programWeek}: Ramping Peak (Last Set Failure + Partials)`}
+            Week {programWeek} • {activeBlock?.focusSummary || activePlan?.subtitle}
           </p>
         </div>
 
@@ -152,7 +208,7 @@ export const ActiveProgramHub: React.FC<ActiveProgramHubProps> = ({ onStartWorko
           aria-label="Weeks carousel"
           className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 scroll-smooth"
         >
-          {Array.from({ length: 12 }, (_, idx) => idx + 1).map(w => {
+          {Array.from({ length: maxProgramWeeks }, (_, idx) => idx + 1).map(w => {
             const isActive = programWeek === w;
             const weekDoneCount = [1, 2, 3, 4, 5].filter(s =>
               activeProgram.completedSessionKeys.includes(`w${w}-d${s}`)
@@ -188,17 +244,17 @@ export const ActiveProgramHub: React.FC<ActiveProgramHubProps> = ({ onStartWorko
         <div className="flex items-center justify-between text-[10px] font-bold text-[#929895]">
           <span className="uppercase tracking-wider">Microcycle Day Queue</span>
           <span className="text-[#C7FF3D]">
-            {activeProgram.completedSessionKeys.filter(k => k.startsWith(`w${programWeek}-`)).length} / 5 Done
+            {activeProgram.completedSessionKeys.filter(k => k.startsWith(`w${programWeek}-`)).length} / {programDays.length} Done
           </span>
         </div>
 
         <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
-          {MICROCYCLE_DAYS.map(day => {
+          {programDays.map(day => {
             const isQueued = currentSlot === day.slot;
             const isCompleted = activeProgram.completedSessionKeys.includes(
               `w${programWeek}-d${day.slot}`
             );
-            const isUpNextHighlight = day.slot === 2;
+            const isUpNextHighlight = day.slot === currentSlot;
 
             return (
               <button
@@ -286,10 +342,10 @@ export const ActiveProgramHub: React.FC<ActiveProgramHubProps> = ({ onStartWorko
         {/* Workout Title */}
         <div>
           <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug">
-            {queuedWorkout.title || 'Foundation D2: Lower (Strength Focus)'}
+            {queuedWorkout.title || 'Next workout'}
           </h3>
           <p className="text-[11px] text-[#929895] mt-0.5">
-            {queuedWorkout.subtitle || 'Weeks 1–5 Block • 6 Exercises • RPE & Failure Progression'}
+            {queuedWorkout.subtitle || activeBlock?.focusSummary || 'Your next scheduled workout'}
           </p>
         </div>
 
@@ -303,12 +359,18 @@ export const ActiveProgramHub: React.FC<ActiveProgramHubProps> = ({ onStartWorko
             <Dumbbell className="w-3 h-3 text-[#C7FF3D]" />
             {queuedWorkout.exercises?.length || 6} Exercises
           </span>
-          <span className="px-2.5 py-1 rounded-lg bg-[#C7FF3D]/10 border border-[#C7FF3D]/30 text-[#C7FF3D] text-[11px] font-bold">
-            Quads
-          </span>
-          <span className="px-2.5 py-1 rounded-lg bg-[#65D9C0]/10 border border-[#65D9C0]/30 text-[#65D9C0] text-[11px] font-bold">
-            Hamstrings & Glutes
-          </span>
+          {queuedWorkout.targetMuscles.slice(0, 2).map((muscle, index) => (
+            <span
+              key={muscle}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold ${
+                index === 0
+                  ? 'bg-[#C7FF3D]/10 border border-[#C7FF3D]/30 text-[#C7FF3D]'
+                  : 'bg-[#65D9C0]/10 border border-[#65D9C0]/30 text-[#65D9C0]'
+              }`}
+            >
+              {muscle}
+            </span>
+          ))}
         </div>
 
         {/* Primary Action: Full-width high-contrast button "[ ▶ START WORKOUT ]" */}

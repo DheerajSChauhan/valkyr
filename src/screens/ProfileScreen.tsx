@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useFitness } from '../context/FitnessContext';
 import { GlassCard } from '../components/common/GlassCard';
 import { pbClient } from '../lib/pocketbase';
@@ -44,8 +44,18 @@ export const ProfileScreen: React.FC = () => {
   const [pbUrl, setPbUrl] = useState(pbClient.getBaseUrl());
   const [pbEmail, setPbEmail] = useState('');
   const [pbPassword, setPbPassword] = useState('');
+  const [pbPasswordConfirm, setPbPasswordConfirm] = useState('');
+  const [pbName, setPbName] = useState(userProfile.name);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(pbClient.isAuthenticated());
   const [confirmReset, setConfirmReset] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    return pbClient.authStore.onChange(() => {
+      setIsAuthenticated(pbClient.isAuthenticated());
+    });
+  }, []);
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,21 +119,50 @@ export const ProfileScreen: React.FC = () => {
   };
 
   const handleSavePbUrl = () => {
-    pbClient.setBaseUrl(pbUrl);
-    triggerCloudSync();
+    try {
+      pbClient.setBaseUrl(pbUrl);
+      triggerCloudSync();
+      showToast('PocketBase URL saved');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Invalid PocketBase URL');
+    }
   };
 
   const handlePbLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pbEmail || !pbPassword) return;
-    const res = await pbClient.loginWithPassword(pbEmail, pbPassword);
+    if (isRegistering && pbPassword !== pbPasswordConfirm) {
+      showToast('⚠️ Passwords do not match');
+      return;
+    }
+    const res = isRegistering
+      ? await pbClient.registerWithPassword(pbEmail, pbPassword, pbPasswordConfirm, pbName)
+      : await pbClient.loginWithPassword(pbEmail, pbPassword);
     if (res.ok) {
-      showToast('✅ Authenticated with PocketBase!');
+      pbClient.reassignQueuedOwnership(pbClient.getAuthenticatedUser()?.id);
+      showToast(isRegistering ? '✅ Account created and signed in!' : '✅ Authenticated with PocketBase!');
       setPbPassword('');
+      setPbPasswordConfirm('');
       triggerCloudSync();
     } else {
       showToast(`⚠️ ${res.error}`);
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    const res = await pbClient.loginWithGoogle();
+    if (res.ok) {
+      setIsAuthenticated(true);
+      showToast('✅ Google account connected!');
+      triggerCloudSync();
+    } else {
+      showToast(`⚠️ ${res.error}`);
+    }
+  };
+
+  const handlePbLogout = () => {
+    pbClient.logout();
+    showToast('Signed out of PocketBase');
   };
 
   return (
@@ -230,29 +269,82 @@ export const ProfileScreen: React.FC = () => {
             </div>
           </div>
 
-          <form onSubmit={handlePbLogin} className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+          {isAuthenticated ? (
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-white">Cloud account connected</p>
+                <p className="text-[11px] text-[#929895] truncate">{pbClient.getAuthenticatedUser()?.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={handlePbLogout}
+                className="btn-glass-subtle px-3 py-2 rounded-xl text-xs font-bold text-white hover:border-[#FF9A58] shrink-0"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+          <form onSubmit={handlePbLogin} className="space-y-2 pt-1">
+            {isRegistering && (
+              <input
+                type="text"
+                placeholder="Display name (optional)"
+                value={pbName}
+                onChange={e => setPbName(e.target.value)}
+                className="w-full bg-[#151718] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C7FF3D]"
+              />
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <input
-              type="text"
-              placeholder="PocketBase Email / User"
+              type="email"
+              required
+              placeholder="Email"
               value={pbEmail}
               onChange={e => setPbEmail(e.target.value)}
               className="bg-[#151718] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C7FF3D]"
             />
             <input
               type="password"
+              required
               placeholder="Password"
               value={pbPassword}
               onChange={e => setPbPassword(e.target.value)}
               className="bg-[#151718] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C7FF3D]"
             />
+            {isRegistering && (
+              <input
+                type="password"
+                required
+                placeholder="Confirm password"
+                value={pbPasswordConfirm}
+                onChange={e => setPbPasswordConfirm(e.target.value)}
+                className="bg-[#151718] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C7FF3D]"
+              />
+            )}
             <button
               type="submit"
               className="btn-glass-subtle py-2 rounded-xl text-xs font-bold text-white hover:border-[#C7FF3D] flex items-center justify-center gap-1.5"
             >
               <CheckCircle className="w-3.5 h-3.5 text-[#C7FF3D]" />
-              <span>Sign In to Cloud</span>
+              <span>{isRegistering ? 'Create Account' : 'Sign In to Cloud'}</span>
+            </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsRegistering(value => !value)}
+              className="text-[11px] font-bold text-[#C7FF3D] hover:underline"
+            >
+              {isRegistering ? 'Already have an account? Sign in' : 'New here? Create an account'}
+            </button>
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full btn-glass-subtle py-2 rounded-xl text-xs font-bold text-white hover:border-[#C7FF3D]"
+            >
+              Continue with Google
             </button>
           </form>
+          )}
         </GlassCard>
       </section>
 

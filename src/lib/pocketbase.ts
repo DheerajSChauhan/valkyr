@@ -1,320 +1,449 @@
-import {
-  WorkoutSummary,
-  CommunityPost,
-  UserProfile,
-  Workout,
-  CustomProgram
-} from '../types';
+import PocketBase, { ClientResponseError } from 'pocketbase';
 
-/**
- * Offline-First PocketBase Client & Sync Queue for Valkyr
- * Works seamlessly with a local or remote PocketBase instance (default http://127.0.0.1:8090)
- * and falls back to an offline localStorage sync queue when in a gym without signal.
- */
+// PocketBase client instance
+const configuredBaseUrl = import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
+const validateBaseUrl = (value: string): string => {
+  const url = new URL(value);
+  const isLocalDevelopment =
+    url.hostname === '127.0.0.1' ||
+    url.hostname === 'localhost' ||
+    url.hostname === '[::1]';
 
-export interface SyncQueueItem {
+  if (url.protocol !== 'https:' && !(import.meta.env.DEV && isLocalDevelopment)) {
+    throw new Error('PocketBase must use HTTPS outside local development.');
+  }
+
+  return url.origin;
+};
+
+const baseUrl = validateBaseUrl(configuredBaseUrl);
+const client = new PocketBase(baseUrl);
+
+// --- Offline queue for offline-first operation ---
+interface QueueItem {
   id: string;
-  collection:
-    | 'workout_sessions'
-    | 'kudos'
-    | 'comments'
-    | 'routines'
-    | 'exercises'
-    | 'custom_programs'
-    | 'users';
-  action: 'create' | 'update';
-  payload: Record<string, unknown>;
-  createdAt: string;
+  collection: QueueCollection;
+  action: QueueAction;
+  data: object;
+  timestamp: number;
 }
 
-const QUEUE_STORAGE_KEY = 'obsidian_pb_sync_queue';
-const PB_URL_STORAGE_KEY = 'obsidian_pb_url';
-const PB_TOKEN_STORAGE_KEY = 'obsidian_pb_auth';
-const pbFetch = (url: string, init?: RequestInit) => fetch(url, init);
+type QueueCollection = 'workout_sessions' | 'workouts' | 'workout_sets' | 'exercises';
+type QueueAction = 'create' | 'update' | 'delete';
 
-export class ObsidianPocketBaseClient {
-  private baseUrl: string;
-  private token: string | null = null;
-  private authRecord: Record<string, unknown> | null = null;
+let queue: QueueItem[] = [];
 
-  constructor() {
-    let savedUrl = 'http://127.0.0.1:8090';
+const QUEUE_STORAGE_KEY = 'obsidian_pb_queue';
+const QUEUE_COLLECTIONS = new Set<QueueCollection>([
+  'workout_sessions',
+  'workouts',
+  'workout_sets',
+  'exercises',
+]);
+
+// Load queue from localStorage on init
+try {
+  const stored = localStorage.getItem(QUEUE_STORAGE_KEY);
+  if (stored) {
+    const parsed: unknown = JSON.parse(stored);
+    if (Array.isArray(parsed)) {
+      queue = parsed.filter((item): item is QueueItem => {
+        const candidate = item as Partial<QueueItem>;
+        return (
+          typeof candidate === 'object' &&
+          candidate !== null &&
+          typeof candidate.collection === 'string' &&
+          QUEUE_COLLECTIONS.has(candidate.collection as QueueCollection) &&
+          (candidate.action === 'create' || candidate.action === 'update' || candidate.action === 'delete') &&
+          typeof candidate.data === 'object' &&
+          candidate.data !== null &&
+          typeof candidate.timestamp === 'number'
+        );
+      }).map(item => ({
+        ...item,
+        id: item.id || `${item.collection}-${crypto.randomUUID()}`
+      }));
+    }
+  }
+} catch {
+  queue = [];
+}
+
+const saveQueue = () => {
+  try {
+    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queue));
+  } catch {
+    // ignore
+  }
+};
+
+// Sanitization helpers
+export const normalizeRoutineTitle = (title: string): string => {
+  return title
+    .replace(/^(Muscle\s*&\s*Strength|muscleandstrength\.com)/i, '')
+    .replace(/[^\w\s\/-]/gi, '')
+    .trim()
+    .replace(/\s+/g, ' ');
+};
+
+export const buildFunctionalTitle = (
+  rawTitle: string,
+  daysPerWeek: number,
+  targetGoal: string,
+  equipment: string,
+  splitType?: string
+): string => {
+  const clean = normalizeRoutineTitle(rawTitle);
+  if (daysPerWeek && targetGoal) {
+    return `${daysPerWeek}-Day ${equipment.replace('Full Gym', 'Gym') || ''} ${targetGoal} ${splitType ? splitType : ''} Split`
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  return clean;
+};
+
+export const resolveSlug = (title: string): string => {
+  return normalizeRoutineTitle(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+
+// Health check
+const checkHealth = async (): Promise<{ online: boolean; message: string }> => {
+  try {
+    await client.health.check();
+    return { online: true, message: 'PocketBase is online' };
+  } catch {
+    return { online: false, message: 'PocketBase is offline' };
+  }
+};
+
+// Enqueue an operation for offline-first operation
+const enqueue = (
+  collection: QueueCollection,
+  action: QueueAction,
+  data: Record<string, unknown>
+): void => {
+  const queueItem: QueueItem = {
+    id: typeof data.id === 'string' ? data.id : `${collection}-${crypto.randomUUID()}`,
+    collection,
+    action,
+    data,
+    timestamp: Date.now()
+  };
+  queue.push(queueItem);
+  saveQueue();
+  if (typeof navigator !== 'undefined' && navigator.onLine && client.authStore.isValid) {
+    void flushQueue();
+  }
+};
+
+// Get the current queue
+const getQueue = (): QueueItem[] => queue;
+
+// Flush the queue to PocketBase
+const flushQueue = async (): Promise<{ synced: number; remaining: number; failed: number }> => {
+  if (!client.authStore.isValid || !client.authStore.record?.id) {
+    return { synced: 0, remaining: queue.length, failed: queue.length };
+  }
+
+  let synced = 0;
+  let failed = 0;
+  const remaining: QueueItem[] = [];
+
+  for (const item of queue) {
     try {
-      savedUrl =
-        localStorage.getItem(PB_URL_STORAGE_KEY) ||
-        (import.meta as unknown as { env?: { VITE_POCKETBASE_URL?: string } })?.env?.VITE_POCKETBASE_URL ||
-        'http://127.0.0.1:8090';
-      const savedAuth = localStorage.getItem(PB_TOKEN_STORAGE_KEY);
-      if (savedAuth) {
-        const parsed = JSON.parse(savedAuth);
-        this.token = parsed.token || null;
-        this.authRecord = parsed.record || null;
+      if (!QUEUE_COLLECTIONS.has(item.collection)) {
+        failed++;
+        continue;
       }
-    } catch {
-      // Ignore storage access errors in restricted frames
-    }
-    this.baseUrl = savedUrl.replace(/\/+$/, '');
-  }
 
-  getBaseUrl(): string {
-    return this.baseUrl;
-  }
-
-  setBaseUrl(url: string): void {
-    this.baseUrl = url.trim().replace(/\/+$/, '');
-    try {
-      localStorage.setItem(PB_URL_STORAGE_KEY, this.baseUrl);
-    } catch {
-      // Ignore
-    }
-  }
-
-  isAuthenticated(): boolean {
-    return Boolean(this.token && this.authRecord);
-  }
-
-  getAuthUser(): Record<string, unknown> | null {
-    return this.authRecord;
-  }
-
-  getQueue(): SyncQueueItem[] {
-    try {
-      const raw = localStorage.getItem(QUEUE_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private saveQueue(queue: SyncQueueItem[]): void {
-    try {
-      localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queue));
-    } catch {
-      // Ignore
-    }
-  }
-
-  enqueue(
-    collection: SyncQueueItem['collection'],
-    action: SyncQueueItem['action'],
-    payload: Record<string, unknown>
-  ): SyncQueueItem {
-    const item: SyncQueueItem = {
-      id: `sync-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      collection,
-      action,
-      payload,
-      createdAt: new Date().toISOString()
-    };
-    const queue = this.getQueue();
-    queue.push(item);
-    this.saveQueue(queue);
-    return item;
-  }
-
-  async checkHealth(): Promise<{ online: boolean; message: string }> {
-    try {
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 2800);
-      const res = await pbFetch(`${this.baseUrl}/api/health`, {
-        method: 'GET',
-        signal: controller.signal
-      });
-      clearTimeout(timeout);
-      if (res.ok) {
-        return { online: true, message: 'PocketBase server healthy & connected' };
+      if (item.action === 'create') {
+        await client.collection(item.collection).create(item.data);
+      } else {
+        const itemData = item.data as Record<string, unknown>;
+        const recordId = typeof itemData.id === 'string' ? itemData.id : '';
+        if (!recordId) throw new Error('Queued update/delete is missing a record id.');
+        if (item.action === 'update') {
+          await client.collection(item.collection).update(recordId, item.data);
+        } else {
+          await client.collection(item.collection).delete(recordId);
+        }
       }
-      return { online: false, message: `Server responded with status ${res.status}` };
+      synced++;
     } catch {
-      return {
-        online: false,
-        message: 'Offline mode active (queued logs will sync when PocketBase is reachable)'
-      };
+      failed++;
+      remaining.push(item);
     }
   }
 
-  async loginWithPassword(
-    emailOrUsername: string,
-    password: string
-  ): Promise<{ ok: boolean; user?: Record<string, unknown>; error?: string }> {
-    try {
-      const res = await pbFetch(`${this.baseUrl}/api/collections/users/auth-with-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identity: emailOrUsername, password })
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        return { ok: false, error: err?.message || 'Invalid credentials' };
-      }
-      const data = await res.json();
-      this.token = data.token;
-      this.authRecord = data.record;
-      localStorage.setItem(
-        PB_TOKEN_STORAGE_KEY,
-        JSON.stringify({ token: data.token, record: data.record })
-      );
-      return { ok: true, user: data.record };
-    } catch {
-      return {
-        ok: false,
-        error: 'Could not reach PocketBase server. Start it with `./pocketbase serve`.'
-      };
-    }
+  queue = remaining;
+  saveQueue();
+  return { synced, remaining: queue.length, failed };
+};
+
+// Publish a routine to the community
+const publishRoutine = async (
+  workout: object,
+  userProfile: { name?: string }
+): Promise<void> => {
+  const userId = client.authStore.record?.id;
+  if (!userId) {
+    throw new Error('Sign in before publishing a routine.');
   }
 
-  logout(): void {
-    this.token = null;
-    this.authRecord = null;
-    try {
-      localStorage.removeItem(PB_TOKEN_STORAGE_KEY);
-    } catch {
-      // Ignore
-    }
+  enqueue('workouts', 'create', {
+    ...workout,
+    authorId: userId,
+    authorName: userProfile.name,
+    isPublic: true,
+    source: 'app',
+  });
+};
+
+// Sync a workout session
+const syncWorkoutSession = async (
+  summary: object,
+  userProfile: { name?: string },
+  session?: {
+    workoutId: string;
+    workoutTitle: string;
+    startTime: number;
+    exercises: Array<{
+      id: string;
+      sets: Array<{
+        setNumber: number;
+        weight: number | string;
+        reps: number | string;
+        completed: boolean;
+        intensityTech?: string;
+      }>;
+    }>;
   }
-
-  async syncWorkoutSession(summary: WorkoutSummary, profile: UserProfile): Promise<boolean> {
-    const payload: Record<string, unknown> = {
-      user: profile.id || this.authRecord?.id || 'local_user',
-      workoutTitle: summary.workoutTitle,
-      workoutId: summary.workoutId || '',
-      durationSec: summary.durationSec,
-      totalVolume: summary.totalVolume,
-      totalSets: summary.totalSets,
-      exercisesCompleted: summary.exercisesCompleted,
-      perceivedRpe: summary.perceivedRpe,
-      notes: summary.notes || '',
-      personalRecords: summary.personalRecords,
-      targetMuscles: summary.targetMuscles || [],
-      exerciseLogs: summary.exerciseLogs || [],
-      kudosCount: 1
-    };
-
-    try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (this.token) headers['Authorization'] = this.token;
-      const res = await pbFetch(`${this.baseUrl}/api/collections/workout_sessions/records`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) return true;
-    } catch {
-      // Network offline -> fall back to queue
-    }
-
-    this.enqueue('workout_sessions', 'create', payload);
+): Promise<boolean> => {
+  const userId = client.authStore.record?.id;
+  if (!userId) {
     return false;
   }
 
-  async flushQueue(): Promise<{ synced: number; remaining: number }> {
-    const queue = this.getQueue();
-    if (queue.length === 0) return { synced: 0, remaining: 0 };
+  const summaryData = summary as Record<string, unknown>;
+  const cloudWorkoutId = `w${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
+    .replace(/[^a-z0-9]/gi, '')
+    .slice(0, 15)
+    .padEnd(15, '0');
+  enqueue('workouts', 'create', {
+    id: cloudWorkoutId,
+    title: typeof summaryData.workoutTitle === 'string' ? summaryData.workoutTitle : 'Workout',
+    started_at: session ? new Date(session.startTime).toISOString() : undefined,
+    completed_at: new Date().toISOString(),
+    notes: typeof summaryData.notes === 'string' ? summaryData.notes : '',
+    user: userId,
+    client_summary_id: typeof summaryData.id === 'string' ? summaryData.id : undefined,
+  });
 
-    const health = await this.checkHealth();
-    if (!health.online) {
-      return { synced: 0, remaining: queue.length };
-    }
-
-    const remaining: SyncQueueItem[] = [];
-    let synced = 0;
-
-    for (const item of queue) {
-      try {
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (this.token) headers['Authorization'] = this.token;
-        const res = await pbFetch(`${this.baseUrl}/api/collections/${item.collection}/records`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(item.payload)
+  if (session) {
+    for (const exercise of session.exercises) {
+      for (const set of exercise.sets) {
+        enqueue('workout_sets', 'create', {
+          workout: cloudWorkoutId,
+          exercise: exercise.id,
+          user: userId,
+          set_index: set.setNumber,
+          set_type: set.intensityTech?.toLowerCase() || 'normal',
+          weight_kg: Number(set.weight) || 0,
+          reps: Number(set.reps) || 0,
+          is_completed: set.completed
         });
-        if (res.ok) {
-          synced++;
-        } else {
-          remaining.push(item);
-        }
-      } catch {
-        remaining.push(item);
       }
     }
-
-    this.saveQueue(remaining);
-    return { synced, remaining: remaining.length };
   }
 
-  async publishRoutine(workout: Workout, profile: UserProfile): Promise<boolean> {
-    const payload = {
-      author: profile.id || this.authRecord?.id || 'local_user',
-      title: workout.title,
-      subtitle: workout.subtitle,
-      category: workout.category,
-      level: workout.level,
-      durationMin: workout.durationMin,
-      programPhase: workout.programPhase || 'Standalone',
-      targetMuscles: workout.targetMuscles,
-      equipment: workout.equipment,
-      exercises: workout.exercises,
-      isPublic: true
-    };
-    this.enqueue('routines', 'create', payload);
-    const { synced } = await this.flushQueue();
-    return synced > 0;
-  }
+  enqueue('workout_sessions', 'create', {
+    ...summaryData,
+    user: userId,
+    name: userProfile.name
+  });
+  return true;
+};
 
-  async publishCustomProgram(
-    program: CustomProgram,
-    profile: UserProfile
-  ): Promise<boolean> {
-    const payload = {
-      author: profile.id || this.authRecord?.id || 'local_user',
-      title: program.title,
-      subtitle: program.subtitle,
-      authorName: program.authorName,
-      isPublic: program.isPublic,
-      daysPerWeek: program.daysPerWeek,
-      scheduleMap: program.scheduleMap,
-      createdAt: program.createdAt
-    };
-    this.enqueue('custom_programs', 'create', payload);
-    const { synced } = await this.flushQueue();
-    return synced > 0;
+// Login with password
+const loginWithPassword = async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+  try {
+    await client.collection('users').authWithPassword(email, password);
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof ClientResponseError ? err.message : 'Authentication failed';
+    return { ok: false, error: message };
   }
+};
 
-  async fetchCommunityFeedFallback(localPosts: CommunityPost[]): Promise<CommunityPost[]> {
-    try {
-      const res = await pbFetch(
-        `${this.baseUrl}/api/collections/workout_sessions/records?sort=-created&perPage=20&expand=user`
-      );
-      if (!res.ok) return localPosts;
-      const data = await res.json();
-      if (!Array.isArray(data?.items) || data.items.length === 0) return localPosts;
-      return data.items.map((item: Record<string, any>) => ({
-        id: item.id,
-        authorId: item.user || 'pb-user',
-        authorName: item.expand?.user?.name || 'Valkyr Athlete',
-        authorHandle: item.expand?.user?.handle || '@athlete',
-        authorAvatar:
-          item.expand?.user?.avatar ||
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-        authorBadge: item.expand?.user?.experience || 'Advanced',
-        workoutTitle: item.workoutTitle,
-        workoutId: item.workoutId,
-        createdAt: item.created || 'Just now',
-        durationSec: item.durationSec || 3000,
-        totalVolumeKg: item.totalVolume || 10000,
-        totalSets: item.totalSets || 16,
-        perceivedRpe: item.perceivedRpe || 8.5,
-        prBadges: Array.isArray(item.personalRecords) ? item.personalRecords : [],
-        targetMuscles: Array.isArray(item.targetMuscles) ? item.targetMuscles : ['Chest', 'Back'],
-        notes: item.notes || '',
-        kudosCount: item.kudosCount || 1,
-        hasKudoed: false,
-        comments: []
-      }));
-    } catch {
-      return localPosts;
-    }
+const loginWithGoogle = async (): Promise<{ ok: boolean; error?: string }> => {
+  try {
+    await client.collection('users').authWithOAuth2({ provider: 'google' });
+    reassignQueuedOwnership(client.authStore.record?.id);
+    await flushQueue();
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof ClientResponseError ? err.message : 'Google authentication failed';
+    return { ok: false, error: message };
   }
-}
+};
 
-export const pbClient = new ObsidianPocketBaseClient();
+const registerWithPassword = async (
+  email: string,
+  password: string,
+  passwordConfirm: string,
+  name?: string
+): Promise<{ ok: boolean; error?: string }> => {
+  try {
+    await client.collection('users').create({
+      email,
+      password,
+      passwordConfirm,
+      name: name?.trim() || undefined,
+    });
+    await client.collection('users').authWithPassword(email, password);
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof ClientResponseError ? err.message : 'Account creation failed';
+    return { ok: false, error: message };
+  }
+};
+
+const logout = (): void => {
+  client.authStore.clear();
+};
+
+const reassignQueuedOwnership = (userId?: string): void => {
+  if (!userId) return;
+  const ownedCollections = new Set<QueueCollection>([
+    'workout_sessions',
+    'workouts',
+    'workout_sets',
+    'exercises'
+  ]);
+  queue = queue.map(item => {
+    if (!ownedCollections.has(item.collection)) return item;
+    const data = item.data as Record<string, unknown>;
+    return { ...item, data: { ...data, user: data.user || userId } };
+  });
+  saveQueue();
+};
+
+const isAuthenticated = (): boolean => {
+  return client.authStore.isValid && Boolean(client.authStore.record?.id);
+};
+
+const getAuthenticatedUser = (): { id: string; email?: string; name?: string } | null => {
+  const record = client.authStore.record;
+  if (!isAuthenticated() || !record) return null;
+  return {
+    id: record.id,
+    email: typeof record.email === 'string' ? record.email : undefined,
+    name: typeof record.name === 'string' ? record.name : undefined,
+  };
+};
+
+// Get base URL
+const getBaseUrl = (): string => {
+  return client.baseUrl;
+};
+
+// Set base URL
+const setBaseUrl = (url: string): void => {
+  const validatedUrl = validateBaseUrl(url.trim());
+  client.baseUrl = validatedUrl;
+  localStorage.setItem('pb_base_url', validatedUrl);
+};
+
+
+// Extended pbClient with offline-first capabilities
+export const pbClient = {
+  ...client,
+  getBaseUrl,
+  setBaseUrl,
+  loginWithPassword,
+  loginWithGoogle,
+  registerWithPassword,
+  logout,
+  isAuthenticated,
+  getAuthenticatedUser,
+  reassignQueuedOwnership,
+  checkHealth,
+  enqueue,
+  getQueue,
+  flushQueue,
+  publishRoutine,
+  syncWorkoutSession,
+};
+
+// Vault-specific fetch functions (used by WorkoutsScreen)
+export const fetchVaultRoutines = async (params?: {
+  search?: string;
+  perPage?: number;
+  sort?: string;
+}): Promise<any[]> => {
+  try {
+    const { search = '', perPage = 50, sort = 'created' } = params || {};
+    const safePageSize = Math.min(Math.max(Math.floor(perPage), 1), 100);
+    const escapedSearch = search.trim().slice(0, 100).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const records = await client
+      .collection('vault_routines')
+      .getList(1, safePageSize, {
+        filter: escapedSearch ? `title ~ "${escapedSearch}"` : undefined,
+        sort,
+        $autoCancel: false,
+      });
+    return records.items || [];
+  } catch (err) {
+    console.warn('[pbClient] fetchVaultRoutines failed:', err);
+    throw err;
+  }
+};
+
+export const fetchRoutineById = async (id: string): Promise<any | null> => {
+  try {
+    return await client.collection('vault_routines').getOne(id);
+  } catch (err) {
+    console.warn('[pbClient] fetchRoutineById failed:', err);
+    return null;
+  }
+};
+
+export const enrollUserProgram = async (routineId: string): Promise<boolean> => {
+  try {
+    const userId = client.authStore.record?.id;
+    if (!userId) return false;
+
+    await client.collection('user_programs').create({
+      user: userId,
+      routine: routineId,
+      status: 'active',
+    });
+    return true;
+  } catch (err) {
+    console.warn('[pbClient] enrollUserProgram failed:', err);
+    return false;
+  }
+};
+
+export const fetchUserEnrolledProgram = async (): Promise<any | null> => {
+  try {
+    const userId = client.authStore.record?.id;
+    if (!userId) return null;
+
+    const records = await client.collection('user_programs').getList(1, 1, {
+      filter: `user = "${userId}" && status = "active"`,
+      sort: '-created',
+    });
+    return records.items[0] || null;
+  } catch (err) {
+    console.warn('[pbClient] fetchUserEnrolledProgram failed:', err);
+    return null;
+  }
+};
+
+export type { VaultRoutine } from '../types';
+export default pbClient;

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { FitnessProvider, useFitness } from './context/FitnessContext';
 import { TopHeader } from './components/navigation/TopHeader';
 import { BottomNav } from './components/navigation/BottomNav';
 import { HomeScreen } from './screens/HomeScreen';
-import { WorkoutsScreen } from './screens/WorkoutsScreen';
+const WorkoutsScreen = React.lazy(() =>
+  import('./screens/WorkoutsScreen').then(module => ({ default: module.WorkoutsScreen }))
+);
 import { PlannerScreen } from './screens/PlannerScreen';
 import { ProgressScreen } from './screens/ProgressScreen';
 import { CommunityScreen } from './screens/CommunityScreen';
@@ -51,7 +53,15 @@ const MainLayout: React.FC = () => {
       <TopHeader />
 
       <main className="max-w-2xl mx-auto px-4 pt-4 sm:pt-6 relative z-10">
-        {renderScreen()}
+        <Suspense
+          fallback={
+            <div className="py-16 text-center text-sm font-bold text-[#929895]" role="status">
+              Loading workouts...
+            </div>
+          }
+        >
+          {renderScreen()}
+        </Suspense>
       </main>
 
       <RestTimerCapsule />

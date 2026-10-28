@@ -2,14 +2,15 @@
   "name": "Valkyr — Premium All-in-One Fitness",
   "short_name": "Valkyr",
   "description": "Valkyr — Premium all-in-one fitness application for strength training, workout tracking, analytics, nutrition and recovery.",
-  "start_url": "./index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#101112",
   "theme_color": "#101112",
   "icons": [
     {
-      "src": "./assets/icons/favicon.svg",
+      "src": "/icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

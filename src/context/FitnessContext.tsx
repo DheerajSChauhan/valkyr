@@ -19,7 +19,8 @@ import {
   Equipment,
   WorkoutExercise,
   WorkoutProgramPlan,
-  ActiveProgramProgress
+  ActiveProgramProgress,
+  CatalogRoutinePlan
 } from '../types';
 import { initialWorkouts } from '../data/workouts';
 import { exerciseLibrary } from '../data/exercises';
@@ -33,6 +34,7 @@ import {
 import { initialNutrition, initialRecovery, initialUserProfile } from '../data/mockNutrition';
 import { initialCommunityPosts } from '../data/mockCommunity';
 import { pbClient } from '../lib/pocketbase';
+import { convertRoutineDayToWorkout } from '../components/workout/routineUtils';
 
 interface FitnessContextType {
   // Navigation & Screen
@@ -53,6 +55,8 @@ interface FitnessContextType {
   programPlans: WorkoutProgramPlan[];
   activeProgram: ActiveProgramProgress;
   startProgramPlan: (programId: string, startWeek?: number) => void;
+  followCatalogRoutine: (routine: CatalogRoutinePlan) => void;
+  unsubscribeProgram: () => void;
   advanceProgramDayOrWeek: (daySlot: number) => void;
   resetProgramProgress: () => void;
   getNextProgramWorkout: () => Workout;
@@ -300,17 +304,31 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [activeProgram, setActiveProgram] = useState<ActiveProgramProgress>(() => {
     try {
       const saved = localStorage.getItem('obsidian_active_program_v1');
-      if (saved) return JSON.parse(saved);
+      const hasExplicitSubscription =
+        localStorage.getItem('obsidian_active_program_subscribed') === 'true';
+      if (saved) {
+        const parsed = JSON.parse(saved) as ActiveProgramProgress;
+        if (parsed.isStarted && hasExplicitSubscription) return parsed;
+      }
     } catch {}
     return {
-      programId: 'prog-jeff-nippard-bts',
-      isStarted: true,
-      startedAt: new Date().toISOString(),
+      programId: '',
+      isStarted: false,
+      startedAt: '',
       currentWeek: 1,
       currentDaySlot: 1,
       completedSessionKeys: [],
       preferredSwaps: {}
     };
+  });
+
+  const [catalogProgramPlans, setCatalogProgramPlans] = useState<WorkoutProgramPlan[]>(() => {
+    try {
+      const saved = localStorage.getItem('obsidian_catalog_program_plans');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
@@ -486,6 +504,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Combine built-in program plans + user custom programs converted to WorkoutProgramPlan
   const programPlans: WorkoutProgramPlan[] = [
     ...builtInProgramPlans,
+    ...catalogProgramPlans,
     ...customPrograms.map(cp => ({
       id: cp.id,
       title: cp.title,
@@ -540,6 +559,65 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       isCustom: true
     }))
   ];
+
+  const followCatalogRoutine = (routine: CatalogRoutinePlan) => {
+    const workoutIds = routine.days.map((day, index) => `${routine.id}-day-${day.dayNumber || index + 1}`);
+    const generatedWorkouts = routine.days.map((day, index) => {
+      const workout = convertRoutineDayToWorkout(routine, day, exerciseLibrary);
+      return { ...workout, id: workoutIds[index], programId: routine.id };
+    });
+    const scheduleSlots = ['plan-mon', 'plan-tue', 'plan-thu', 'plan-fri', 'plan-sat'] as const;
+    const scheduleMap: CustomProgram['scheduleMap'] = {
+      'plan-mon': null,
+      'plan-tue': null,
+      'plan-wed': null,
+      'plan-thu': null,
+      'plan-fri': null,
+      'plan-sat': null,
+      'plan-sun': null
+    };
+    workoutIds.forEach((id, index) => {
+      const slot = scheduleSlots[index];
+      if (slot) scheduleMap[slot] = id;
+    });
+    const plan: WorkoutProgramPlan = {
+      id: routine.id,
+      title: routine.title,
+      subtitle: routine.description,
+      author: routine.author,
+      badge: `${routine.daysPerWeek}-DAY WEEKLY SPLIT`,
+      level: routine.level as DifficultyLevel,
+      totalWeeks: 12,
+      daysPerWeek: routine.daysPerWeek,
+      sessionDurationMin: routine.duration,
+      heroImage: routine.coverImage,
+      aboutSummary: routine.description,
+      splitOverview: `${routine.daysPerWeek}-day ${routine.splitType} split`,
+      progressionPhilosophy: 'Progress through the prescribed rep ranges while maintaining consistent form.',
+      importantNotes: [],
+      intensityTechniques: [],
+      blocks: [{
+        id: `${routine.id}-block`,
+        name: routine.shortTitle || routine.title,
+        weeksLabel: 'Weeks 1–12',
+        weekStart: 1,
+        weekEnd: 12,
+        focusSummary: routine.description,
+        rpeProtocol: 'Follow the prescribed sets, reps, and rest periods.',
+        workoutIds,
+        scheduleMap
+      }]
+    };
+    setWorkouts(prev => [...generatedWorkouts, ...prev.filter(workout => !workoutIds.includes(workout.id))]);
+    setCatalogProgramPlans(prev => {
+      const next = [...prev.filter(item => item.id !== plan.id), plan];
+      try {
+        localStorage.setItem('obsidian_catalog_program_plans', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    startProgramPlan(routine.id);
+  };
 
   // Sync scheduleDays to a given week of the Jeff Nippard 12-week program (or custom plan)
   const syncScheduleToProgramWeek = (
@@ -648,6 +726,9 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       completedSessionKeys: activeProgram.completedSessionKeys,
       preferredSwaps: activeProgram.preferredSwaps || {}
     };
+    try {
+      localStorage.setItem('obsidian_active_program_subscribed', 'true');
+    } catch {}
     setActiveProgram(nextState);
     syncScheduleToProgramWeek(programId, clampedWeek, nextState.completedSessionKeys);
 
@@ -667,9 +748,26 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const resetProgramProgress = () => {
     const fresh: ActiveProgramProgress = {
-      programId: activeProgram.programId || 'prog-jeff-nippard-bts',
-      isStarted: true,
+      programId: activeProgram.programId,
+      isStarted: Boolean(activeProgram.programId),
       startedAt: new Date().toISOString(),
+      currentWeek: 1,
+      currentDaySlot: 1,
+      completedSessionKeys: [],
+      preferredSwaps: {}
+    };
+
+    setActiveProgram(fresh);
+    setProgramWeekState(1);
+    syncScheduleToProgramWeek(fresh.programId, 1, []);
+    showToast('Program progress reset to Week 1 • Day 1');
+  };
+
+  const unsubscribeProgram = () => {
+    const fresh: ActiveProgramProgress = {
+      programId: '',
+      isStarted: false,
+      startedAt: '',
       currentWeek: 1,
       currentDaySlot: 1,
       completedSessionKeys: [],
@@ -677,8 +775,10 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     setActiveProgram(fresh);
     setProgramWeekState(1);
-    syncScheduleToProgramWeek(fresh.programId, 1, []);
-    showToast('Program progress reset to Week 1 • Day 1');
+    try {
+      localStorage.removeItem('obsidian_active_program_subscribed');
+    } catch {}
+    showToast('Program unsubscribed');
   };
 
   const getNextProgramWorkout = (): Workout => {
@@ -1240,7 +1340,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
 
     if (willBeCompleted) {
-      startRestTimer(ex.defaultRestSec, `${ex.name} • Set ${setIndex + 1} Rest`);
+      startRestTimer(ex.defaultRestSec || 90, `${ex.name} • Set ${setIndex + 1} Rest`);
     }
   };
 
@@ -1560,7 +1660,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     setCommunityPosts(prev => [newPost, ...prev]);
 
-    pbClient.syncWorkoutSession(summary, userProfile).then(synced => {
+    pbClient.syncWorkoutSession(summary, userProfile, activeSession).then(synced => {
       setPbOnline(synced);
       setPbQueueCount(pbClient.getQueue().length);
     });
@@ -1750,6 +1850,9 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       currentWeek: 1,
       currentDaySlot: 1
     }));
+    try {
+      localStorage.setItem('obsidian_active_program_subscribed', 'true');
+    } catch {}
     showToast(`Saved & activated custom program "${program.title}"`);
     return program.id;
   };
@@ -1793,6 +1896,9 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       programId: program.id,
       isStarted: true
     }));
+    try {
+      localStorage.setItem('obsidian_active_program_subscribed', 'true');
+    } catch {}
     showToast(`Applied custom program "${program.title}"`);
   };
 
@@ -1915,7 +2021,12 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (Array.isArray(parsed.workouts)) setWorkouts(parsed.workouts);
       if (Array.isArray(parsed.workoutSummaries)) setWorkoutSummaries(parsed.workoutSummaries);
       if (Array.isArray(parsed.scheduleDays)) setScheduleDays(parsed.scheduleDays);
-      if (parsed.activeProgram) setActiveProgram(parsed.activeProgram);
+      if (parsed.activeProgram) {
+        setActiveProgram(parsed.activeProgram);
+        if (parsed.activeProgram.isStarted) {
+          localStorage.setItem('obsidian_active_program_subscribed', 'true');
+        }
+      }
       showToast('Backup restored successfully!');
       return true;
     } catch {
@@ -1940,6 +2051,8 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         programPlans,
         activeProgram,
         startProgramPlan,
+        followCatalogRoutine,
+        unsubscribeProgram,
         advanceProgramDayOrWeek,
         resetProgramProgress,
         getNextProgramWorkout,

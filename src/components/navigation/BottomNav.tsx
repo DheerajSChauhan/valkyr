@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFitness } from '../../context/FitnessContext';
 import { ScreenId } from '../../types';
-import { Home, Dumbbell, Calendar, TrendingUp, Users, User } from 'lucide-react';
+import { Home, Dumbbell, Calendar, TrendingUp, Users } from 'lucide-react';
 
 interface NavItem {
   id: ScreenId;
@@ -14,8 +14,7 @@ const navItems: NavItem[] = [
   { id: 'workouts', label: 'Workouts', icon: Dumbbell },
   { id: 'planner', label: 'Planner', icon: Calendar },
   { id: 'progress', label: 'Analytics', icon: TrendingUp },
-  { id: 'community', label: 'Social', icon: Users },
-  { id: 'profile', label: 'Profile', icon: User }
+  { id: 'community', label: 'Social', icon: Users }
 ];
 
 export const BottomNav: React.FC = () => {

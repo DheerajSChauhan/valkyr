@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFitness } from '../../context/FitnessContext';
 import { warmupData } from '../../data/warmupData';
 import { Exercise } from '../../types';
@@ -62,6 +62,7 @@ export const ProgramGuidebookModal: React.FC<ProgramGuidebookModalProps> = ({
     programPlans,
     activeProgram,
     startProgramPlan,
+    unsubscribeProgram,
     programWeek,
     setProgramWeek,
     workouts,
@@ -89,6 +90,29 @@ export const ProgramGuidebookModal: React.FC<ProgramGuidebookModalProps> = ({
     start: number;
   } | null>(null);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const scrollY = window.scrollY;
+    const bodyStyle = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+      touchAction: document.body.style.touchAction
+    };
+    document.documentElement.classList.add('modal-open');
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => {
+      document.documentElement.classList.remove('modal-open');
+      Object.assign(document.body.style, bodyStyle);
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const currentPlan =
@@ -112,7 +136,7 @@ export const ProgramGuidebookModal: React.FC<ProgramGuidebookModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-[10000] bg-black/90 backdrop-blur-2xl flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
@@ -833,6 +857,15 @@ export const ProgramGuidebookModal: React.FC<ProgramGuidebookModalProps> = ({
             </span>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
+            {activeProgram.isStarted && activeProgram.programId === currentPlan.id && (
+              <button
+                type="button"
+                onClick={unsubscribeProgram}
+                className="px-4 py-2.5 rounded-xl text-xs font-black text-[#FCA5A5] bg-[#EF4444]/10 hover:bg-[#EF4444]/20 border border-[#EF4444]/30 flex-1 sm:flex-initial"
+              >
+                Unfollow
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}

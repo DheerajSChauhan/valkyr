@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "name": "Valkyr tracking schema",
+    "version": 1
+  },
+  "collections": [
+    {
+      "name": "exercises",
+      "type": "base",
+      "fields": [
+        { "name": "name", "type": "text", "required": true, "max": 120 },
+        { "name": "muscle_group", "type": "text", "required": true, "max": 40 },
+        { "name": "equipment", "type": "text", "required": true, "max": 40 },
+        { "name": "is_custom", "type": "bool" },
+        { "name": "user", "type": "relation", "collection": "users", "required": false }
+      ],
+      "rules": {
+        "list": "@request.auth.id != '' && (is_custom = false || user = @request.auth.id)",
+        "view": "@request.auth.id != '' && (is_custom = false || user = @request.auth.id)",
+        "create": "@request.auth.id != '' && is_custom = true && user = @request.auth.id",
+        "update": "@request.auth.id != '' && user = @request.auth.id",
+        "delete": "@request.auth.id != '' && user = @request.auth.id"
+      }
+    },
+    {
+      "name": "workouts",
+      "type": "base",
+      "fields": [
+        { "name": "user", "type": "relation", "collection": "users", "required": true },
+        { "name": "title", "type": "text", "required": true, "max": 160 },
+        { "name": "started_at", "type": "date" },
+        { "name": "completed_at", "type": "date" },
+        { "name": "notes", "type": "text", "max": 4000 }
+      ],
+      "rules": {
+        "list": "@request.auth.id != '' && user = @request.auth.id",
+        "view": "@request.auth.id != '' && user = @request.auth.id",
+        "create": "@request.auth.id != '' && user = @request.auth.id",
+        "update": "@request.auth.id != '' && user = @request.auth.id",
+        "delete": "@request.auth.id != '' && user = @request.auth.id"
+      }
+    },
+    {
+      "name": "workout_sets",
+      "type": "base",
+      "fields": [
+        { "name": "workout", "type": "relation", "collection": "workouts", "required": true },
+        { "name": "exercise", "type": "relation", "collection": "exercises", "required": true },
+        { "name": "user", "type": "relation", "collection": "users", "required": true },
+        { "name": "set_index", "type": "number", "required": true, "min": 1 },
+        { "name": "set_type", "type": "text", "required": true, "max": 20 },
+        { "name": "weight_kg", "type": "number", "min": 0 },
+        { "name": "reps", "type": "number", "min": 0 },
+        { "name": "rpe", "type": "number", "min": 1, "max": 10 },
+        { "name": "is_completed", "type": "bool" }
+      ],
+      "rules": {
+        "list": "@request.auth.id != '' && user = @request.auth.id",
+        "view": "@request.auth.id != '' && user = @request.auth.id",
+        "create": "@request.auth.id != '' && user = @request.auth.id",
+        "update": "@request.auth.id != '' && user = @request.auth.id",
+        "delete": "@request.auth.id != '' && user = @request.auth.id"
+      }
+    }
+  ]
+}

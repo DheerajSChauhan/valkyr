@@ -13,7 +13,8 @@ import {
   Sparkles,
   Info,
   Calendar,
-  Flame
+  Flame,
+  UserPlus
 } from 'lucide-react';
 
 interface RoutinePreviewModalProps {
@@ -27,13 +28,46 @@ export const RoutinePreviewModal: React.FC<RoutinePreviewModalProps> = ({
   isOpen,
   onClose
 }) => {
-  const { exercises: libraryExercises, startWorkout, createCustomWorkout, showToast } = useFitness();
+  const {
+    exercises: libraryExercises,
+    startWorkout,
+    createCustomWorkout,
+    showToast,
+    activeProgram,
+    startProgramPlan,
+    followCatalogRoutine,
+    unsubscribeProgram
+  } = useFitness();
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [hasCloned, setHasCloned] = useState(false);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const scrollY = window.scrollY;
+    const bodyStyle = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+      touchAction: document.body.style.touchAction
+    };
+    document.documentElement.classList.add('modal-open');
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => {
+      document.documentElement.classList.remove('modal-open');
+      Object.assign(document.body.style, bodyStyle);
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
 
   if (!isOpen || !plan) return null;
 
   const currentDay = plan.days[selectedDayIdx] || plan.days[0];
+  const isFollowing = activeProgram.isStarted && activeProgram.programId === plan.id;
 
   const handleStartDayWorkout = () => {
     if (!currentDay) return;
@@ -64,11 +98,11 @@ export const RoutinePreviewModal: React.FC<RoutinePreviewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl bg-[#141617] border border-white/10 shadow-2xl overflow-hidden text-[#F5F5F2]">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200 overscroll-contain">
+      <div className="relative w-full max-w-2xl h-[calc(100dvh-1rem)] max-h-[92vh] flex flex-col rounded-2xl sm:rounded-3xl bg-[#141617] border border-white/10 shadow-2xl overflow-hidden text-[#F5F5F2]">
         
         {/* Cover Header */}
-        <div className="relative h-44 sm:h-52 w-full shrink-0 overflow-hidden">
+        <div className="relative h-32 sm:h-44 w-full shrink-0 overflow-hidden">
           <img
             src={plan.coverImage}
             alt={plan.title}
@@ -111,9 +145,9 @@ export const RoutinePreviewModal: React.FC<RoutinePreviewModalProps> = ({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 no-scrollbar">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-4 space-y-3 no-scrollbar">
           {/* Plan Description & Quick Stats */}
-          <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 space-y-2">
+          <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/5 space-y-2">
             <p className="text-xs text-[#929895] leading-relaxed">
               {plan.description}
             </p>
@@ -188,7 +222,7 @@ export const RoutinePreviewModal: React.FC<RoutinePreviewModalProps> = ({
                 {currentDay.exercises.map((ex, exIdx) => (
                   <div
                     key={`${ex.name}-${exIdx}`}
-                    className="p-3 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between gap-3 hover:border-white/15 transition"
+                    className="p-2.5 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between gap-2 hover:border-white/15 transition"
                   >
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center gap-2">
@@ -220,12 +254,31 @@ export const RoutinePreviewModal: React.FC<RoutinePreviewModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-3.5 sm:p-4 border-t border-white/10 bg-[#101112] flex items-center gap-2.5">
+        <div className="shrink-0 p-2.5 sm:p-3 border-t border-white/10 bg-[#101112] space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (isFollowing) {
+                unsubscribeProgram();
+              } else {
+                followCatalogRoutine(plan);
+              }
+            }}
+            className={`w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all border ${
+              isFollowing
+                ? 'bg-[#EF4444]/10 hover:bg-[#EF4444]/20 text-[#FCA5A5] border-[#EF4444]/30'
+                : 'bg-[#C7FF3D] hover:bg-[#d5ff5e] text-[#101112] border-[#C7FF3D]'
+            }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>{isFollowing ? 'Unfollow Weekly Plan' : 'Follow Weekly Plan'}</span>
+          </button>
+          <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
           <button
             type="button"
             onClick={handleCloneAllDays}
             disabled={hasCloned}
-            className={`flex-1 py-3 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] border ${
+            className={`w-full sm:flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] border ${
               hasCloned
                 ? 'bg-[#65D9C0]/20 text-[#65D9C0] border-[#65D9C0]/40'
                 : 'bg-white/[0.08] hover:bg-white/[0.14] text-white border-white/10'
@@ -247,11 +300,12 @@ export const RoutinePreviewModal: React.FC<RoutinePreviewModalProps> = ({
           <button
             type="button"
             onClick={handleStartDayWorkout}
-            className="flex-1 py-3 px-3 rounded-xl bg-[#C7FF3D] hover:bg-[#d5ff5e] text-[#101112] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-[#C7FF3D]/25 active:scale-[0.98] transition-all"
+            className="w-full sm:flex-1 py-2.5 px-3 rounded-xl bg-[#C7FF3D] hover:bg-[#d5ff5e] text-[#101112] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-[#C7FF3D]/25 active:scale-[0.98] transition-all"
           >
             <Play className="w-4 h-4 fill-[#101112]" />
             <span>Start Day {currentDay?.dayNumber || 1}</span>
           </button>
+        </div>
         </div>
 
       </div>

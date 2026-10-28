@@ -18,7 +18,10 @@ import {
   Sparkles,
   ChevronRight,
   Zap,
-  Flame
+  Flame,
+  Grid3X3,
+  LayoutGrid,
+  ListFilter
 } from 'lucide-react';
 import { useFitness } from '../context/FitnessContext';
 import { GlassCard } from '../components/common/GlassCard';
@@ -31,8 +34,9 @@ import rawRoutines from '../data/routinesCatalog.json';
 import { FamousSplitsCarousel } from '../components/workout/FamousSplitsCarousel';
 import { RoutinePreviewModal } from '../components/workout/RoutinePreviewModal';
 import { RoutineVaultModal } from '../components/workout/RoutineVaultModal';
+import { enrollUserProgram } from '../lib/pocketbase';
 
-const catalogRoutines = rawRoutines as CatalogRoutinePlan[];
+const catalogRoutines: CatalogRoutinePlan[] = rawRoutines as unknown as CatalogRoutinePlan[];
 
 // --- CURATED ATHLETIC IMAGERY (High-Performance Athletics) ---
 const IMAGES = {
@@ -263,6 +267,12 @@ export const WorkoutsScreen: React.FC = () => {
     startEmptyWorkout
   } = useFitness();
 
+  // Routine vault state is component-local so it follows the Rules of Hooks.
+  const [isRoutineVaultSheetOpen, setIsRoutineVaultSheetOpen] = useState(false);
+  const [isRoutinePreviewOpen, setIsRoutinePreviewOpen] = useState(false);
+  const [selectedVaultRoutine, setSelectedVaultRoutine] = useState<CatalogRoutinePlan | null>(null);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [enrollToast, setEnrollToast] = useState<string | null>(null);
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<'home' | 'category' | 'detail' | 'directory'>('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('gym');
@@ -291,6 +301,28 @@ export const WorkoutsScreen: React.FC = () => {
   const [completedSets, setCompletedSets] = useState<{ [key: string]: boolean }>({});
   const [workoutTimer, setWorkoutTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  useEffect(() => {
+    const isModalOpen =
+      isRoutineVaultSheetOpen ||
+      isRoutinePreviewOpen ||
+      isRoutineVaultOpen ||
+      isFilterModalOpen ||
+      isLiveWorkoutOpen;
+    if (!isModalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [
+    isRoutineVaultSheetOpen,
+    isRoutinePreviewOpen,
+    isRoutineVaultOpen,
+    isFilterModalOpen,
+    isLiveWorkoutOpen
+  ]);
 
   // Power feature modals
   const [showRoutineBuilder, setShowRoutineBuilder] = useState(false);
@@ -499,7 +531,7 @@ export const WorkoutsScreen: React.FC = () => {
       {/* ================= SCREEN 1: BROWSE BY CATEGORY ================= */}
       {currentScreen === 'home' && (
         <div className="space-y-6 animate-in fade-in duration-200">
-          
+
           {/* Header Title & Subtitle */}
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -548,11 +580,10 @@ export const WorkoutsScreen: React.FC = () => {
                     key={chip}
                     type="button"
                     onClick={() => setQuickFilter(chip)}
-                    className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 border ${
-                      isActive
+                    className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 border ${isActive
                         ? 'bg-[#C7FF3D] text-[#101112] border-[#C7FF3D] shadow-md shadow-[#C7FF3D]/25 ring-1 ring-[#C7FF3D]/40'
                         : 'bg-[#151718] text-[#929895] hover:text-white border-white/10 hover:border-white/20'
-                    }`}
+                      }`}
                   >
                     {chip}
                   </button>
@@ -594,6 +625,7 @@ export const WorkoutsScreen: React.FC = () => {
           <FamousSplitsCarousel
             routines={catalogRoutines}
             onSelectRoutine={routine => setSelectedCatalogRoutine(routine)}
+            onSelectFeaturedProgram={() => openGuidebook('guidelines')}
             activeFilter={quickFilter}
           />
 
@@ -620,29 +652,21 @@ export const WorkoutsScreen: React.FC = () => {
               <ChevronRight className="w-4 h-4 text-[#929895] group-hover:translate-x-1 group-hover:text-white transition" />
             </button>
 
-            {/* Routine Vault (1,000+ Free Plans) prominent card */}
+            {/* Routine Database Vault - open as mobile bottom sheet drawer modal */}
             <button
               type="button"
-              onClick={() => setIsRoutineVaultOpen(true)}
+              onClick={() => setIsRoutineVaultSheetOpen(true)}
               className="p-3.5 rounded-2xl bg-gradient-to-r from-[#172018] via-[#161819] to-[#161819] border border-[#C7FF3D]/30 hover:border-[#C7FF3D] transition text-left flex items-center justify-between group shadow-lg active:scale-[0.99]"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#C7FF3D]/15 flex items-center justify-center text-[#C7FF3D]">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="text-xs sm:text-sm font-black text-white group-hover:text-[#C7FF3D] transition">
-                      Routine Vault (1,000+ Free Plans)
-                    </h4>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#C7FF3D] animate-ping" />
-                  </div>
-                  <p className="text-[10px] text-[#929895]">
-                    Browse by target muscle, training days, and equipment
-                  </p>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <h4 className="text-xs sm:text-sm font-black text-white group-hover:text-[#C7FF3D] transition">
+                  Routine Vault
+                </h4>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C7FF3D] animate-ping" />
               </div>
-              <ChevronRight className="w-4 h-4 text-[#C7FF3D] group-hover:translate-x-1 transition" />
+              <span className="text-[#C7FF3D] text-xs font-black">
+                <Layers className="w-4 h-4" />
+              </span>
             </button>
           </div>
 
@@ -872,7 +896,7 @@ export const WorkoutsScreen: React.FC = () => {
       {/* ================= SCREEN 2: CATEGORY DRILLDOWN ("For The Gym") ================= */}
       {currentScreen === 'category' && (
         <div className="space-y-4 animate-in fade-in duration-200">
-          
+
           {/* Subheader / Navigation Bar */}
           <div className="flex items-center justify-between gap-3">
             <button
@@ -890,11 +914,10 @@ export const WorkoutsScreen: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsFilterModalOpen(true)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 border transition ${
-                hasActiveFilters
+              className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 border transition ${hasActiveFilters
                   ? 'bg-[#C7FF3D] text-[#101112] border-[#C7FF3D]'
                   : 'btn-glass-subtle text-white'
-              }`}
+                }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
               <span>Filters</span>
@@ -917,22 +940,22 @@ export const WorkoutsScreen: React.FC = () => {
                 {activeTabFilter === 'saved'
                   ? 'YOUR BOOKMARKS'
                   : activeTabFilter === 'completed'
-                  ? 'COMPLETED WORKOUTS'
-                  : 'ATHLETIC COLLECTION'}
+                    ? 'COMPLETED WORKOUTS'
+                    : 'ATHLETIC COLLECTION'}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-0.5 leading-tight">
                 {activeTabFilter === 'saved'
                   ? 'Saved Workouts'
                   : activeTabFilter === 'completed'
-                  ? 'Completed Workouts'
-                  : currentCategoryData.name}
+                    ? 'Completed Workouts'
+                    : currentCategoryData.name}
               </h2>
               <p className="text-xs text-[#929895] font-medium mt-1 leading-relaxed max-w-xl line-clamp-2">
                 {activeTabFilter === 'saved'
                   ? 'Your bookmarked hypertrophy and conditioning sessions ready for immediate execution.'
                   : activeTabFilter === 'completed'
-                  ? 'Log of all finished workouts with total sets and progression volume.'
-                  : currentCategoryData.heroDesc || `High-intensity programs built with clean progressive overload and focused mechanics.`}
+                    ? 'Log of all finished workouts with total sets and progression volume.'
+                    : currentCategoryData.heroDesc || `High-intensity programs built with clean progressive overload and focused mechanics.`}
               </p>
             </div>
           </div>
@@ -1017,11 +1040,10 @@ export const WorkoutsScreen: React.FC = () => {
                           title="Bookmark workout"
                         >
                           <Bookmark
-                            className={`w-4 h-4 ${
-                              savedWorkoutIds.includes(workout.id)
+                            className={`w-4 h-4 ${savedWorkoutIds.includes(workout.id)
                                 ? 'fill-[#C7FF3D] text-[#C7FF3D]'
                                 : ''
-                            }`}
+                              }`}
                           />
                         </button>
                       </div>
@@ -1081,11 +1103,10 @@ export const WorkoutsScreen: React.FC = () => {
               title="Bookmark workout"
             >
               <Bookmark
-                className={`w-4 h-4 ${
-                  savedWorkoutIds.includes(selectedWorkout.id)
+                className={`w-4 h-4 ${savedWorkoutIds.includes(selectedWorkout.id)
                     ? 'fill-[#C7FF3D] text-[#C7FF3D]'
                     : ''
-                }`}
+                  }`}
               />
             </button>
           </div>
@@ -1307,11 +1328,10 @@ export const WorkoutsScreen: React.FC = () => {
                       onClick={() => {
                         setCompletedSets(prev => ({ ...prev, [key]: !prev[key] }));
                       }}
-                      className={`py-3 rounded-xl font-black text-xs flex flex-col items-center justify-center gap-1 transition-all ${
-                        isDone
+                      className={`py-3 rounded-xl font-black text-xs flex flex-col items-center justify-center gap-1 transition-all ${isDone
                           ? 'bg-[#C7FF3D] text-[#101112] shadow-lg shadow-[#C7FF3D]/30 scale-[1.02]'
                           : 'bg-white/[0.06] text-white hover:bg-white/10 border border-white/10'
-                      }`}
+                        }`}
                     >
                       <span>Set {idx + 1}</span>
                       {isDone ? (
@@ -1388,11 +1408,10 @@ export const WorkoutsScreen: React.FC = () => {
                     key={lvl}
                     type="button"
                     onClick={() => setFilterLevel(lvl)}
-                    className={`py-2 text-[11px] font-bold rounded-lg transition ${
-                      filterLevel === lvl
+                    className={`py-2 text-[11px] font-bold rounded-lg transition ${filterLevel === lvl
                         ? 'bg-[#C7FF3D] text-[#101112] shadow-md font-black'
                         : 'text-[#929895] hover:text-white'
-                    }`}
+                      }`}
                   >
                     {lvl}
                   </button>
@@ -1411,11 +1430,10 @@ export const WorkoutsScreen: React.FC = () => {
                     key={eq}
                     type="button"
                     onClick={() => setFilterEquipment(eq)}
-                    className={`py-2 text-[11px] font-bold rounded-lg transition ${
-                      filterEquipment === eq
+                    className={`py-2 text-[11px] font-bold rounded-lg transition ${filterEquipment === eq
                         ? 'bg-[#C7FF3D] text-[#101112] shadow-md font-black'
                         : 'text-[#929895] hover:text-white'
-                    }`}
+                      }`}
                   >
                     {eq}
                   </button>
@@ -1434,11 +1452,10 @@ export const WorkoutsScreen: React.FC = () => {
                     key={dur}
                     type="button"
                     onClick={() => setFilterDuration(dur)}
-                    className={`py-2 text-[11px] font-bold rounded-lg transition ${
-                      filterDuration === dur
+                    className={`py-2 text-[11px] font-bold rounded-lg transition ${filterDuration === dur
                         ? 'bg-[#C7FF3D] text-[#101112] shadow-md font-black'
                         : 'text-[#929895] hover:text-white'
-                    }`}
+                      }`}
                   >
                     {dur}
                   </button>
@@ -1494,13 +1511,94 @@ export const WorkoutsScreen: React.FC = () => {
         onClose={() => setSelectedCatalogRoutine(null)}
       />
 
-      {/* Routine Database Vault (1,000+ Free Plans) */}
-      <RoutineVaultModal
-        isOpen={isRoutineVaultOpen}
-        onClose={() => setIsRoutineVaultOpen(false)}
-        routines={catalogRoutines}
-        onSelectRoutine={routine => setSelectedCatalogRoutine(routine)}
-      />
+      {/* Mobile bottom sheet drawer modal - preserves background screens (Home + Workout Hub) */}
+      {isRoutineVaultSheetOpen && (
+        <div className="mobile-sheet-overlay" onClick={() => setIsRoutineVaultSheetOpen(false)}>
+          <div
+            className="mobile-sheet"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-label="Routine vault drawer"
+          >
+            <div className="mobile-sheet__handle"></div>
+            <div className="mobile-sheet__body mobile-top-safe">
+              <RoutineVaultModal
+                isOpen
+                onClose={() => setIsRoutineVaultSheetOpen(false)}
+                routines={catalogRoutines}
+                onSelectRoutine={(r) => {
+                  setSelectedVaultRoutine(r as CatalogRoutinePlan);
+                  setIsRoutineVaultSheetOpen(false);
+                  setIsRoutinePreviewOpen(true);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Routine Details Drawer View - full screen when opened from sheet */}
+      {isRoutinePreviewOpen && selectedVaultRoutine && (
+        <div className="mobile-sheet-overlay" onClick={() => { setIsRoutinePreviewOpen(false); setSelectedVaultRoutine(null); }}>
+          <div
+            className="mobile-sheet"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-label="Routine details"
+          >
+            <div className="mobile-sheet__handle"></div>
+            <div className="mobile-sheet__body mobile-top-safe">
+              <RoutinePreviewModal
+                plan={selectedVaultRoutine}
+                isOpen
+                onClose={() => {
+                  setIsRoutinePreviewOpen(false);
+                  setSelectedVaultRoutine(null);
+                }}
+              />
+              <div className="p-3.5 border-t border-white/10 bg-[#101112] flex gap-3 mt-3">
+                <button
+                  type="button"
+                  className="flex-1 py-3.5 px-4 rounded-xl bg-[#C7FF3D] hover:bg-[#d5ff5e] text-[#101112] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#C7FF3D]/25 active:scale-[0.98] transition-all"
+                  onClick={() => {
+                    setIsEnrolling(true);
+                    enrollUserProgram(selectedVaultRoutine.id!).then((ok: boolean) => {
+                      setIsEnrolling(false);
+                      setEnrollToast(ok ? '✓ Set as Active Program' : 'Failed to enroll');
+                      setTimeout(() => setEnrollToast(null), 2500);
+                    });
+                  }}
+                >
+                  {isEnrolling ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Enrolling...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4" />
+                      <span>Set as Active Program</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-3.5 rounded-xl btn-glass-subtle text-xs font-black"
+                  onClick={() => {
+                    setIsRoutinePreviewOpen(false);
+                    setSelectedVaultRoutine(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+              {enrollToast && (
+                <div className="px-3.5 pb-3 text-xs font-black text-[#65D9C0]">{enrollToast}</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

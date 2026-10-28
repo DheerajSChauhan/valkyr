@@ -5,7 +5,8 @@ import {
   Exercise,
   DifficultyLevel,
   Equipment,
-  WorkoutCategory
+  WorkoutCategory,
+  CatalogRoutineExercise,
 } from '../../types';
 
 export const convertRoutineDayToWorkout = (
@@ -15,7 +16,7 @@ export const convertRoutineDayToWorkout = (
 ): Workout => {
   const workoutId = `catalog-${plan.id}-d${day.dayNumber}-${Date.now()}`;
 
-  const convertedExercises: Exercise[] = day.exercises.map((ex, idx) => {
+  const convertedExercises: Exercise[] = day.exercises.map((ex: CatalogRoutineExercise, idx: number) => {
     // Try to find a matching exercise in library
     const matched = libraryExercises.find(
       libEx => libEx.name.toLowerCase() === ex.name.toLowerCase()
@@ -73,7 +74,7 @@ export const convertRoutineDayToWorkout = (
     category,
     level,
     durationMin: parseInt(plan.duration, 10) || 55,
-    targetMuscles: Array.from(new Set(day.exercises.map(e => e.targetMuscle || 'Full Body'))),
+    targetMuscles: Array.from(new Set(day.exercises.map((e: CatalogRoutineExercise) => e.targetMuscle || 'Full Body'))),
     equipment: ['Barbell', 'Dumbbells', 'Machines'],
     image: plan.coverImage,
     programPhase: 'Standalone',

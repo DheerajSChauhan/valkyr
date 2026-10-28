@@ -5,12 +5,14 @@ import { ChevronLeft, ChevronRight, Sparkles, Copy, Layers, ArrowUpRight } from 
 interface FamousSplitsCarouselProps {
   routines: CatalogRoutinePlan[];
   onSelectRoutine: (routine: CatalogRoutinePlan) => void;
+  onSelectFeaturedProgram?: () => void;
   activeFilter?: string;
 }
 
 export const FamousSplitsCarousel: React.FC<FamousSplitsCarouselProps> = ({
   routines,
   onSelectRoutine,
+  onSelectFeaturedProgram,
   activeFilter = 'All'
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -33,7 +35,7 @@ export const FamousSplitsCarousel: React.FC<FamousSplitsCarouselProps> = ({
     return true;
   });
 
-  if (filteredRoutines.length === 0) {
+  if (filteredRoutines.length === 0 && !onSelectFeaturedProgram) {
     return null;
   }
 
@@ -137,6 +139,48 @@ export const FamousSplitsCarousel: React.FC<FamousSplitsCarouselProps> = ({
             </div>
           </article>
         ))}
+        {onSelectFeaturedProgram && (
+          <article className="shrink-0 w-[240px] sm:w-[260px] rounded-2xl bg-[#161819] border border-[#C7FF3D]/30 hover:border-[#C7FF3D] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-lg group">
+            <div className="relative h-28 w-full overflow-hidden shrink-0">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(199,255,61,0.28),transparent_55%),linear-gradient(135deg,#0d0e0f,#242827)]" />
+              <div className="absolute inset-0 flex flex-col justify-end p-3">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#C7FF3D]">
+                  Jeff Nippard
+                </span>
+                <span className="text-lg font-black leading-tight text-white">
+                  Transformation System
+                </span>
+              </div>
+              <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-[#C7FF3D] text-[#101112] text-[10px] font-black uppercase tracking-wider">
+                12 Weeks
+              </span>
+            </div>
+            <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+              <div>
+                <span className="text-[9px] font-black uppercase tracking-wider text-[#929895] block">
+                  Official PDF System
+                </span>
+                <h3 className="text-sm font-black text-white group-hover:text-[#C7FF3D] transition">
+                  The Bodybuilding Transformation System
+                </h3>
+                <p className="text-[10px] text-[#929895] line-clamp-2 mt-0.5 leading-relaxed">
+                  A science-based 5-day hybrid upper/lower and push/pull/legs program.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={onSelectFeaturedProgram}
+                  className="w-full py-2 px-3 rounded-xl bg-[#C7FF3D] hover:bg-[#d5ff5e] text-[#101112] text-xs font-black transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>View Program</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </article>
+        )}
       </div>
     </section>
   );

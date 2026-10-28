@@ -3,14 +3,20 @@ import { useFitness } from '../../context/FitnessContext';
 import { Flame, Bell, Sparkles } from 'lucide-react';
 
 export const TopHeader: React.FC = () => {
-  const { userProfile, toggleUnit, showToast } = useFitness();
+  const { userProfile, toggleUnit, showToast, currentScreen, setCurrentScreen } = useFitness();
 
   return (
     <header className="sticky top-0 z-30 bg-[#101112]/80 backdrop-blur-2xl border-b border-white/[0.08] px-4 py-3">
       <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
         {/* User Info & Avatar */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative">
+          <button
+            type="button"
+            onClick={() => setCurrentScreen('profile')}
+            className="relative rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C7FF3D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#101112] transition-transform hover:scale-105 active:scale-95"
+            aria-label={`Open profile for ${userProfile.name}`}
+            title="Open Profile"
+          >
             <img
               src={userProfile.avatar}
               alt={userProfile.name}
@@ -19,7 +25,10 @@ export const TopHeader: React.FC = () => {
             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#101112] flex items-center justify-center">
               <div className="w-2.5 h-2.5 rounded-full bg-[#C7FF3D]" />
             </div>
-          </div>
+            {currentScreen === 'profile' && (
+              <span className="absolute -inset-1 rounded-full border border-[#C7FF3D]/70" aria-hidden="true" />
+            )}
+          </button>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] font-black tracking-widest text-[#C7FF3D] uppercase">VALKYR</span>

@@ -439,6 +439,36 @@ export interface FeedActivityItem {
   routineClone?: Workout;
 }
 
+export interface RoutineExercise {
+  exercise: string;
+  sets: number;
+  reps: string;
+  rest: string;
+  targetMuscle: string;
+  notes?: string;
+}
+
+export interface RoutineDay {
+  dayNumber: number;
+  dayTitle: string;
+  focus: string;
+  targetMuscle: string;
+  exercises: RoutineExercise[];
+}
+
+export interface VaultRoutine {
+  id: string;
+  title: string;
+  slug: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  days_per_week: number;
+  daysPerWeek?: number;
+  target_goal: string;
+  equipment: string;
+  is_featured: boolean;
+  structure: RoutineDay[];
+}
+
 export interface CatalogRoutineExercise {
   name: string;
   sets: number;
@@ -446,7 +476,6 @@ export interface CatalogRoutineExercise {
   rest: string;
   targetMuscle: string;
   notes?: string;
-  intensityTechnique?: string;
 }
 
 export interface CatalogRoutineDay {
@@ -456,21 +485,18 @@ export interface CatalogRoutineDay {
   exercises: CatalogRoutineExercise[];
 }
 
-export interface CatalogRoutinePlan {
-  id: string;
-  title: string;
+export interface CatalogRoutinePlan extends VaultRoutine {
   shortTitle: string;
   author: string;
-  daysPerWeek: number;
   daysBadge: string;
   goal: string;
   goalBadge: string;
   level: DifficultyLevel | string;
-  equipment: string;
   duration: string;
   splitType: string;
   description: string;
   coverImage: string;
   tags: string[];
+  daysPerWeek: number;
   days: CatalogRoutineDay[];
 }
